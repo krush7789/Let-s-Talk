@@ -1,36 +1,50 @@
-import {Server} from "socket.io";
+import { Server } from "socket.io";
 import express from "express";
 import http from "http";
 
 const app = express();
-
 const server = http.createServer(app);
 
+// Setup socket.io with CORS
 const io = new Server(server, {
-    cors:{
-        origin:process.env.URL,
-        methods:['GET','POST']
+    cors: {
+        origin: 'http://localhost:5173', // Frontend URL (change as needed)
+        methods: ['GET', 'POST']
     }
-})
+});
 
-const userSocketMap = {} ; // this map stores socket id corresponding the user id; userId -> socketId
+// This map stores userId -> socketId
+const userSocketMap = {};
 
+// Function to get receiver's socketId by userId
 export const getReceiverSocketId = (receiverId) => userSocketMap[receiverId];
 
-io.on('connection', (socket)=>{
-    const userId = socket.handshake.query.userId;
-    if(userId){
-        userSocketMap[userId] = socket.id;
+// Handling socket connection
+io.on('connection', (socket) => {
+    const userId = socket.handshake.query.userId; // Get userId from the socket connection query
+
+    // Check if userId is provided
+    if (userId) {
+        userSocketMap[userId] = socket.id; // Store the socketId for the userId
+        console.log(`User ${userId} connected with socket id: ${socket.id}`);
+    } else {
+        console.log('No userId provided in the socket connection');
+        socket.disconnect(); // Disconnect if userId is not present
+        return;
     }
 
+    // Emit online users list to all connected clients
     io.emit('getOnlineUsers', Object.keys(userSocketMap));
 
-    socket.on('disconnect',()=>{
-        if(userId){
-            delete userSocketMap[userId];
+    // Handle disconnect
+    socket.on('disconnect', () => {
+        if (userId) {
+            delete userSocketMap[userId]; // Remove userId from the map
+            console.log(`User ${userId} disconnected`);
         }
+        // Emit updated online users list to all connected clients
         io.emit('getOnlineUsers', Object.keys(userSocketMap));
     });
-})
+});
 
-export {app, server, io};
+export { app, server, io };
