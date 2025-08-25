@@ -8,7 +8,7 @@ const server = http.createServer(app);
 // Setup socket.io with CORS
 const io = new Server(server, {
     cors: {
-        origin: 'http://localhost:5173', // Frontend URL (change as needed)
+        origin: 'https://let-s-talk-lq7h.onrender.com', // Frontend URL (change as needed)
         methods: ['GET', 'POST']
     }
 });

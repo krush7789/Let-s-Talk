@@ -17,7 +17,7 @@ const ChatPage = () => {
 
     const sendMessageHandler = async (receiverId) => {
         try {
-            const res = await axios.post(`http://localhost:5173/api/v1/message/send/${receiverId}`, { textMessage }, {
+            const res = await axios.post(`https://let-s-talk-lq7h.onrender.com/api/v1/message/send/${receiverId}`, { textMessage }, {
                 headers: {
                     'Content-Type': 'application/json'
                 },
