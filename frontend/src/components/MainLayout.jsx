@@ -25,7 +25,7 @@ const MainLayout = () => {
             </Button>
             <div className="flex items-center gap-2 rounded-lg border border-[var(--color-outline)] bg-[var(--color-surface)] px-3 py-1.5">
               <Sparkles className="h-5 w-5 text-[var(--color-primary-start)]" />
-              <span className="font-semibold tracking-tight text-[var(--color-text)]">NovaSphere</span>
+              <span className="font-semibold tracking-tight text-[var(--color-text)]">Let&apos;s Talk</span>
             </div>
           </div>
           <div className="hidden flex-1 items-center gap-2 lg:flex">

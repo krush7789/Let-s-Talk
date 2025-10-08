@@ -47,8 +47,10 @@ export const addNewPost = async (req, res) => {
 }
 export const getAllPost = async (req, res) => {
     try {
+        const viewerId = req.id;
+
         const posts = await Post.find().sort({ createdAt: -1 })
-            .populate({ path: 'author', select: 'username profilePicture' })
+            .populate({ path: 'author', select: 'username profilePicture accountType followers' })
             .populate({
                 path: 'comments',
                 sort: { createdAt: -1 },
@@ -57,8 +59,25 @@ export const getAllPost = async (req, res) => {
                     select: 'username profilePicture'
                 }
             });
+
+        const visiblePosts = posts
+            .filter(post => {
+                const author = post.author;
+                if (!author) return false;
+                if (author.accountType !== 'private') return true;
+                if (author._id.equals(viewerId)) return true;
+                return author.followers.some(followerId => followerId.equals(viewerId));
+            })
+            .map(post => {
+                const serializedPost = post.toObject({ depopulate: false });
+                if (serializedPost.author) {
+                    delete serializedPost.author.followers;
+                }
+                return serializedPost;
+            });
+
         return res.status(200).json({
-            posts,
+            posts: visiblePosts,
             success: true
         })
     } catch (error) {

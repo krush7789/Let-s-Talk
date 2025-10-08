@@ -54,7 +54,7 @@ const Explore = () => {
       <div className='flex flex-col gap-4 rounded-xl border border-[var(--color-outline)] bg-[var(--color-surface-raised)] p-8 text-[var(--color-text-muted)] shadow-[0_18px_32px_rgba(0,0,0,0.08)]'>
         <div className='flex flex-col gap-2'>
           <h1 className='text-3xl font-semibold text-[var(--color-text)]'>Explore trending stories</h1>
-          <p className='text-sm text-[var(--color-text-muted)]'>Dive into the moments people are loving right now across NovaSphere.</p>
+          <p className='text-sm text-[var(--color-text-muted)]'>Dive into the moments people are loving right now across Let&apos;s Talk.</p>
         </div>
         <div className='flex flex-wrap gap-3'>
           {FILTERS.map(filter => {

@@ -14,8 +14,8 @@
   --color-primary-solid: #cdb4f4;
   --color-accent: #d5b69d;
   --color-accent-soft: #e8d6c6;
-  --color-text: #333333;
-  --color-text-muted: #4a4a4a;
+  --color-text: #1f1f1f;
+  --color-text-muted: #353535;
   --color-divider: rgba(0, 0, 0, 0.06);
   --color-shadow: rgba(0, 0, 0, 0.04);
 }
