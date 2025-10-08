@@ -1,5 +1,5 @@
 import { setPosts } from '@/redux/postSlice';
-import axios from 'axios';
+import apiClient from '@/lib/apiClient';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -8,12 +8,12 @@ const useGetAllPost = () => {
     useEffect(() => {
         const fetchAllPost = async () => {
             try {
-                const res = await axios.get('https://let-s-talk-lq7h.onrender.com/api/v1/post/all', { withCredentials: true });
+                const res = await apiClient.get('/post/all');
                 if (res.data.success) {
                     dispatch(setPosts(res.data.posts));
                 }
             } catch (error) {
-                console.log(error);
+                console.error(error);
             }
         };
         fetchAllPost();

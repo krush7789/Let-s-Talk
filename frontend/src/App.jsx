@@ -12,6 +12,7 @@ import ExploreReels from './components/ExploreReels';
 import TagFeed from './components/TagFeed';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { io } from 'socket.io-client';
+import { SOCKET_URL } from '@/lib/apiClient';
 import { useDispatch, useSelector } from 'react-redux';
 import { setSocket } from './redux/socketSlice';
 import { setOnlineUsers } from './redux/chatSlice';
@@ -74,11 +75,12 @@ function App() {
 
   useEffect(() => {
     if (user) {
-      const socketio = io('https://let-s-talk-lq7h.onrender.com/', {
+      const socketio = io(SOCKET_URL, {
         query: {
           userId: user?._id
         },
-        transports: ['websocket']
+        transports: ['websocket'],
+        withCredentials: true
       });
       dispatch(setSocket(socketio));
 

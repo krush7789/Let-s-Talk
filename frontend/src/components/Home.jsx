@@ -13,8 +13,8 @@ const Home = () => {
     useReels();
 
     return (
-        <div className='flex gap-6 px-10 pt-10'>
-            <div className='flex-1 max-w-2xl'>
+        <div className='mx-auto flex w-full max-w-6xl flex-col gap-8 lg:flex-row lg:items-start'>
+            <div className='flex-1 space-y-8'>
                 <Feed />
             </div>
             <RightSidebar />
@@ -23,4 +23,3 @@ const Home = () => {
 };
 
 export default Home;
-

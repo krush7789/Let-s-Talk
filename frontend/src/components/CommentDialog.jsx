@@ -6,7 +6,7 @@ import { MoreHorizontal } from 'lucide-react'
 import { Button } from './ui/button'
 import { useDispatch, useSelector } from 'react-redux'
 import Comment from './Comment'
-import axios from 'axios'
+import apiClient from '@/lib/apiClient';
 import { toast } from 'sonner'
 import { setPosts } from '@/redux/postSlice'
 
@@ -34,12 +34,15 @@ const CommentDialog = ({ open, setOpen }) => {
   const sendMessageHandler = async () => {
 
     try {
-      const res = await axios.post(`https://let-s-talk-lq7h.onrender.com/api/v1/post/${selectedPost?._id}/comment`, { text }, {
+      const res = await apiClient.post(
+      `/post/${selectedPost?._id}/comment`,
+      { text },
+      {
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        withCredentials: true
-      });
+      },
+    );
 
       if (res.data.success) {
         const updatedCommentData = [...comment, res.data.comment];
@@ -53,7 +56,7 @@ const CommentDialog = ({ open, setOpen }) => {
         setText("");
       }
     } catch (error) {
-      console.log(error);
+      toast.error(error.message || 'Unable to add comment');
     }
   }
 

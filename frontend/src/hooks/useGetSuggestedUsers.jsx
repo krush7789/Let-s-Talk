@@ -1,5 +1,5 @@
 import { setSuggestedUsers } from "@/redux/authSlice";
-import axios from "axios";
+import apiClient from '@/lib/apiClient';
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 
@@ -9,12 +9,12 @@ const useGetSuggestedUsers = () => {
     useEffect(() => {
         const fetchSuggestedUsers = async () => {
             try {
-                const res = await axios.get('https://let-s-talk-lq7h.onrender.com/api/v1/user/suggested', { withCredentials: true });
+                const res = await apiClient.get('/user/suggested');
                 if (res.data.success) { 
                     dispatch(setSuggestedUsers(res.data.users));
                 }
             } catch (error) {
-                console.log(error);
+                console.error(error);
             }
         }
         fetchSuggestedUsers();

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import axios from 'axios';
+import apiClient from '@/lib/apiClient';
 import { Button } from './ui/button';
 import { useNavigate } from 'react-router-dom';
 
@@ -12,12 +12,12 @@ const Explore = () => {
         const fetchExplore = async () => {
             try {
                 setLoading(true);
-                const res = await axios.get('https://let-s-talk-lq7h.onrender.com/api/v1/post/explore', { withCredentials: true });
+                const res = await apiClient.get('/post/explore');
                 if (res.data.success) {
                     setPosts(res.data.posts);
                 }
             } catch (error) {
-                console.log(error);
+                console.error(error);
             } finally {
                 setLoading(false);
             }

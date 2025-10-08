@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from "react";
-import axios from "axios";
+import apiClient from '@/lib/apiClient';
 import { useDispatch } from "react-redux";
 import { setFollowRequests, setAuthUser } from "@/redux/authSlice";
 
@@ -8,12 +8,12 @@ const useFollowRequests = () => {
 
     const fetchFollowRequests = useCallback(async () => {
         try {
-            const res = await axios.get('https://let-s-talk-lq7h.onrender.com/api/v1/user/follow-requests', { withCredentials: true });
+            const res = await apiClient.get('/user/follow-requests');
             if (res.data.success) {
                 dispatch(setFollowRequests(res.data.requests));
             }
         } catch (error) {
-            console.log(error);
+            console.error(error);
         }
     }, [dispatch]);
 
@@ -23,10 +23,10 @@ const useFollowRequests = () => {
 
     const respondToRequest = useCallback(async ({ requesterId, action }) => {
         try {
-            const res = await axios.post('https://let-s-talk-lq7h.onrender.com/api/v1/user/follow-requests/respond', {
+            const res = await apiClient.post('/user/follow-requests/respond', {
                 requesterId,
                 action
-            }, { withCredentials: true });
+            });
             if(res.data.success){
                 dispatch(setFollowRequests(res.data.requests));
                 if(res.data.user){
@@ -35,7 +35,7 @@ const useFollowRequests = () => {
             }
             return res.data;
         } catch (error) {
-            console.log(error);
+            console.error(error);
             throw error;
         }
     }, [dispatch]);

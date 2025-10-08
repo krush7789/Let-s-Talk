@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { AtSign, Heart, MessageCircle } from 'lucide-react';
-import axios from 'axios';
+import apiClient from '@/lib/apiClient';
 import { toast } from 'sonner';
 
 const Profile = () => {
@@ -34,13 +34,13 @@ const Profile = () => {
 
   const handleFollowAction = async () => {
     try {
-      const res = await axios.post(`https://let-s-talk-lq7h.onrender.com/api/v1/user/followorunfollow/${userId}`, {}, { withCredentials: true });
+      const res = await apiClient.post(`/user/followorunfollow/${userId}`, {});
       if(res.data.success){
         toast.success(res.data.message);
         await refetch();
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       toast.error(error?.response?.data?.message || 'Something went wrong');
     }
   };

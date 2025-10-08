@@ -1,17 +1,32 @@
 import { Server } from "socket.io";
 import express from "express";
 import http from "http";
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
 
 // Setup socket.io with CORS
+const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5173')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
 const io = new Server(server, {
     cors: {
-        origin: 'https://let-s-talk-lq7h.onrender.com', // Frontend URL (change as needed)
-        methods: ['GET', 'POST']
+        origin(origin, callback) {
+            if (!origin || allowedOrigins.includes(origin)) {
+                return callback(null, true);
+            }
+            return callback(new Error('Not allowed by CORS'));
+        },
+        credentials: true,
+        methods: ['GET', 'POST'],
     }
 });
+
 
 // This map stores userId -> socketId
 const userSocketMap = {};

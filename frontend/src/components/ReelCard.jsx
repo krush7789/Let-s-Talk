@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Button } from './ui/button';
 import { Heart, Play } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
-import axios from 'axios';
+import apiClient from '@/lib/apiClient';
 import { toggleReelLike } from '@/redux/reelSlice';
 
 const ReelCard = ({ reel }) => {
@@ -18,14 +18,14 @@ const ReelCard = ({ reel }) => {
         try {
             setLikeLoading(true);
             if(isLiked){
-                await axios.post(`https://let-s-talk-lq7h.onrender.com/api/v1/reel/${reel._id}/unlike`, {}, { withCredentials: true });
+                await apiClient.post(`/reel/${reel._id}/unlike`, {});
                 dispatch(toggleReelLike({ reelId: reel._id, userId: user._id, liked: false }));
             }else{
-                await axios.post(`https://let-s-talk-lq7h.onrender.com/api/v1/reel/${reel._id}/like`, {}, { withCredentials: true });
+                await apiClient.post(`/reel/${reel._id}/like`, {});
                 dispatch(toggleReelLike({ reelId: reel._id, userId: user._id, liked: true }));
             }
         } catch (error) {
-            console.log(error);
+            console.error(error);
         } finally {
             setLikeLoading(false);
         }
@@ -35,9 +35,9 @@ const ReelCard = ({ reel }) => {
         if(viewed || !user?._id) return;
         try {
             setViewed(true);
-            await axios.post(`https://let-s-talk-lq7h.onrender.com/api/v1/reel/${reel._id}/view`, {}, { withCredentials: true });
+            await apiClient.post(`/reel/${reel._id}/view`, {});
         } catch (error) {
-            console.log(error);
+            console.error(error);
         }
     };
 

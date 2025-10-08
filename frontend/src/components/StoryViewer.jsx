@@ -3,7 +3,7 @@ import { Dialog, DialogContent } from './ui/dialog';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Button } from './ui/button';
 import { X } from 'lucide-react';
-import axios from 'axios';
+import apiClient from '@/lib/apiClient';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateStoryViewers } from '@/redux/storySlice';
 
@@ -15,10 +15,10 @@ const StoryViewer = ({ story, open, onOpenChange }) => {
         const markViewed = async () => {
             if(!story?._id) return;
             try {
-                await axios.post(`https://let-s-talk-lq7h.onrender.com/api/v1/story/${story._id}/view`, {}, { withCredentials: true });
+                await apiClient.post(`/story/${story._id}/view`, {});
                 dispatch(updateStoryViewers({ storyId: story._id, viewerId: user?._id }));
             } catch (error) {
-                console.log(error);
+                console.error(error);
             }
         };
         if(open){

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import apiClient from '@/lib/apiClient';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 
 const ExploreReels = () => {
@@ -10,12 +10,12 @@ const ExploreReels = () => {
         const fetchReels = async () => {
             try {
                 setLoading(true);
-                const res = await axios.get('https://let-s-talk-lq7h.onrender.com/api/v1/reel/explore', { withCredentials: true });
+                const res = await apiClient.get('/reel/explore');
                 if (res.data.success) {
                     setReels(res.data.reels);
                 }
             } catch (error) {
-                console.log(error);
+                console.error(error);
             } finally {
                 setLoading(false);
             }

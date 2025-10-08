@@ -1,5 +1,5 @@
 import { setUserProfile } from "@/redux/authSlice";
-import axios from "axios";
+import apiClient from '@/lib/apiClient';
 import { useCallback, useEffect } from "react";
 import { useDispatch } from "react-redux";
 
@@ -10,12 +10,12 @@ const useGetUserProfile = (userId) => {
     const fetchUserProfile = useCallback(async () => {
         if(!userId) return;
         try {
-            const res = await axios.get(`https://let-s-talk-lq7h.onrender.com/api/v1/user/${userId}/profile`, { withCredentials: true });
+            const res = await apiClient.get(`/user/${userId}/profile`);
             if (res.data.success) {
                 dispatch(setUserProfile({ user: res.data.user, meta: res.data.meta }));
             }
         } catch (error) {
-            console.log(error);
+            console.error(error);
         }
     }, [dispatch, userId]);
 

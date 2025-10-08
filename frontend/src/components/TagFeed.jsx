@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
+import apiClient from '@/lib/apiClient';
 
 const TagFeed = () => {
     const { tag } = useParams();
@@ -14,12 +14,12 @@ const TagFeed = () => {
         const fetchTagPosts = async () => {
             try {
                 setLoading(true);
-                const res = await axios.get(`https://let-s-talk-lq7h.onrender.com/api/v1/post/tags/${normalizedTag}`, { withCredentials: true });
+                const res = await apiClient.get(`/post/tags/${normalizedTag}`);
                 if (res.data.success) {
                     setPosts(res.data.posts);
                 }
             } catch (error) {
-                console.log(error);
+                console.error(error);
                 setPosts([]);
             } finally {
                 setLoading(false);

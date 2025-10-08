@@ -1,40 +1,48 @@
-import React from 'react'
-import { useSelector } from 'react-redux'
+import React from 'react';
+import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { Button } from './ui/button';
 
 const SuggestedUsers = () => {
-    const { suggestedUsers } = useSelector(store => store.auth);
+    const { suggestedUsers } = useSelector((store) => store.auth);
+
+    if (!suggestedUsers?.length) {
+        return null;
+    }
+
     return (
-        <div className='my-10'>
-            <div className='flex items-center justify-between text-sm'>
-                <h1 className='font-semibold text-gray-600'>Suggested for you</h1>
-                <span className='font-medium cursor-pointer'>See All</span>
+        <section className='rounded-3xl border border-slate-200/70 bg-white/85 p-5 shadow-[0_20px_60px_-40px_rgba(30,64,175,0.4)] backdrop-blur'>
+            <div className='mb-4 flex items-center justify-between'>
+                <div>
+                    <h2 className='text-sm font-semibold text-slate-900'>Connections worth exploring</h2>
+                    <p className='text-xs text-slate-500'>Discover people aligned with your vibe.</p>
+                </div>
+                <Link to='/search' className='text-xs font-medium text-indigo-600 hover:text-indigo-500'>See all</Link>
             </div>
-            {
-                suggestedUsers.map((user) => {
-                    return (
-                        <div key={user._id} className='flex items-center justify-between my-5'>
-                            <div className='flex items-center gap-2'>
-                                <Link to={`/profile/${user?._id}`}>
-                                    <Avatar>
-                                        <AvatarImage src={user?.profilePicture} alt="post_image" />
-                                        <AvatarFallback>CN</AvatarFallback>
-                                    </Avatar>
+            <div className='space-y-4'>
+                {suggestedUsers.slice(0, 5).map((profile) => (
+                    <div key={profile._id} className='flex items-center justify-between rounded-2xl border border-slate-100/80 bg-slate-50/60 p-3 transition hover:border-indigo-200'>
+                        <div className='flex items-center gap-3'>
+                            <Avatar className='h-10 w-10 border border-indigo-100'>
+                                <AvatarImage src={profile?.profilePicture} alt={profile?.username} />
+                                <AvatarFallback>SG</AvatarFallback>
+                            </Avatar>
+                            <div className='flex flex-col'>
+                                <Link to={`/profile/${profile?._id}`} className='text-sm font-semibold text-slate-900 hover:text-indigo-600'>
+                                    {profile?.username}
                                 </Link>
-                                <div>
-                                    <h1 className='font-semibold text-sm'><Link to={`/profile/${user?._id}`}>{user?.username}</Link></h1>
-                                    <span className='text-gray-600 text-sm'>{user?.bio || 'Bio here...'}</span>
-                                </div>
+                                <span className='text-xs text-slate-500'>{profile?.bio || 'New on Pulseboard'}</span>
                             </div>
-                            <span className='text-[#3BADF8] text-xs font-bold cursor-pointer hover:text-[#3495d6]'>Follow</span>
                         </div>
-                    )
-                })
-            }
+                        <Button asChild size='sm' variant='outline' className='rounded-full border-indigo-200 text-indigo-600 hover:bg-indigo-500/10'>
+                            <Link to={`/profile/${profile?._id}`}>View</Link>
+                        </Button>
+                    </div>
+                ))}
+            </div>
+        </section>
+    );
+};
 
-        </div>
-    )
-}
-
-export default SuggestedUsers
+export default SuggestedUsers;

@@ -5,7 +5,7 @@ import { Textarea } from './ui/textarea';
 import { useDispatch, useSelector } from 'react-redux';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { readFileAsDataURL } from '@/lib/utils';
-import axios from 'axios';
+import apiClient from '@/lib/apiClient';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { addStory } from '@/redux/storySlice';
@@ -49,9 +49,8 @@ const StoryComposer = () => {
         formData.append('media', mediaFile);
         try {
             setLoading(true);
-            const res = await axios.post('https://let-s-talk-lq7h.onrender.com/api/v1/story', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-                withCredentials: true
+            const res = await apiClient.post('/story', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
             });
             if(res.data.success){
                 dispatch(addStory(res.data.story));
@@ -59,7 +58,7 @@ const StoryComposer = () => {
                 resetComposer();
             }
         } catch (error) {
-            console.log(error);
+            console.error(error);
             toast.error(error?.response?.data?.message || 'Unable to add story');
         } finally {
             setLoading(false);

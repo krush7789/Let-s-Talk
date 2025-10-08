@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from "react";
-import axios from "axios";
+import apiClient from '@/lib/apiClient';
 import { useDispatch } from "react-redux";
 import { addReel, setReelLoading, setReels } from "@/redux/reelSlice";
 
@@ -9,12 +9,12 @@ const useReels = () => {
     const fetchReels = useCallback(async () => {
         try {
             dispatch(setReelLoading(true));
-            const res = await axios.get('https://let-s-talk-lq7h.onrender.com/api/v1/reel', { withCredentials: true });
+            const res = await apiClient.get('/reel');
             if (res.data.success) {
                 dispatch(setReels(res.data.reels));
             }
         } catch (error) {
-            console.log(error);
+            console.error(error);
         } finally {
             dispatch(setReelLoading(false));
         }

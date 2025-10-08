@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Textarea } from './ui/textarea';
 import { Button } from './ui/button';
 import { useDispatch, useSelector } from 'react-redux';
-import axios from 'axios';
+import apiClient from '@/lib/apiClient';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { addReel } from '@/redux/reelSlice';
@@ -47,9 +47,8 @@ const ReelComposer = () => {
         formData.append('video', videoFile);
         try {
             setLoading(true);
-            const res = await axios.post('https://let-s-talk-lq7h.onrender.com/api/v1/reel', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' },
-                withCredentials: true
+            const res = await apiClient.post('/reel', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
             });
             if(res.data.success){
                 dispatch(addReel(res.data.reel));
@@ -57,7 +56,7 @@ const ReelComposer = () => {
                 reset();
             }
         } catch (error) {
-            console.log(error);
+            console.error(error);
             toast.error(error?.response?.data?.message || 'Unable to share reel');
         } finally {
             setLoading(false);
