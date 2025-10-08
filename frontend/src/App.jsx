@@ -1,10 +1,13 @@
 import { useEffect } from 'react'
 import ChatPage from './components/ChatPage'
 import EditProfile from './components/EditProfile'
+import Explore from './components/Explore'
 import Home from './components/Home'
 import Login from './components/Login'
 import MainLayout from './components/MainLayout'
+import Notifications from './components/Notifications'
 import Profile from './components/Profile'
+import Search from './components/Search'
 import Signup from './components/Signup'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { io } from "socket.io-client";
@@ -25,8 +28,20 @@ const browserRouter = createBrowserRouter([
         element: <ProtectedRoutes><Home /></ProtectedRoutes>
       },
       {
+        path: '/search',
+        element: <ProtectedRoutes><Search /></ProtectedRoutes>
+      },
+      {
+        path: '/explore',
+        element: <ProtectedRoutes><Explore /></ProtectedRoutes>
+      },
+      {
         path: '/profile/:id',
         element: <ProtectedRoutes> <Profile /></ProtectedRoutes>
+      },
+      {
+        path: '/notifications',
+        element: <ProtectedRoutes><Notifications /></ProtectedRoutes>
       },
       {
         path: '/account/edit',

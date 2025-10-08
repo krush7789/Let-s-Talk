@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useNavigate } from 'react-router-dom'
 import { Menu, Search, Sparkles } from 'lucide-react'
 import LeftSidebar from './LeftSidebar'
 import { Button } from './ui/button'
@@ -8,6 +8,7 @@ import { Input } from './ui/input'
 const MainLayout = () => {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const [createPostOpen, setCreatePostOpen] = useState(false)
+  const navigate = useNavigate()
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100">
@@ -38,6 +39,7 @@ const MainLayout = () => {
                 <Input
                   placeholder="Search people, tags, or spaces"
                   className="w-full border-slate-800 bg-slate-900/70 pl-10 text-slate-100 placeholder:text-slate-500"
+                  onFocus={() => navigate('/search')}
                 />
               </div>
             </div>

@@ -7,7 +7,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { setAuthUser } from '@/redux/authSlice'
 import CreatePost from './CreatePost'
 import { setPosts, setSelectedPost } from '@/redux/postSlice'
-import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
 import { Button } from './ui/button'
 import { cn } from '@/lib/utils'
 
@@ -37,8 +36,14 @@ const LeftSidebar = ({ mobileOpen, onMobileClose, createOpen, onCreateOpenChange
     switch (textType) {
       case 'Home':
         return '/'
+      case 'Search':
+        return '/search'
+      case 'Explore':
+        return '/explore'
       case 'Messages':
         return '/chat'
+      case 'Notifications':
+        return '/notifications'
       case 'Profile':
         return `/profile/${user?._id}`
       default:
@@ -59,18 +64,8 @@ const LeftSidebar = ({ mobileOpen, onMobileClose, createOpen, onCreateOpenChange
       return
     }
 
-    if (textType === 'Notifications') {
-      if (!likeNotification.length) {
-        toast.info('You are all caught up!')
-      }
-      return
-    }
-
-    if (textType === 'Search' || textType === 'Explore') {
-      toast('Coming soon', {
-        description: 'We are curating smarter discovery tools for you. Stay tuned!'
-      })
-      return
+    if (textType === 'Notifications' && !likeNotification.length) {
+      toast.info('You are all caught up!')
     }
 
     const route = routeForItem(textType)
@@ -110,37 +105,9 @@ const LeftSidebar = ({ mobileOpen, onMobileClose, createOpen, onCreateOpenChange
   }
 
   const notificationBadge = likeNotification.length > 0 && (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button
-          size='icon'
-          className='absolute -right-1 -top-1 h-6 w-6 rounded-full bg-gradient-to-br from-rose-500 via-amber-400 to-amber-300 text-xs font-semibold text-slate-900 shadow-md shadow-rose-500/30 hover:from-rose-400 hover:via-amber-300 hover:to-amber-200'
-        >
-          {likeNotification.length}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className='w-72 border border-slate-800/70 bg-slate-900/80 text-slate-200 backdrop-blur-xl'>
-        <div className='space-y-4 text-sm'>
-          <div>
-            <h4 className='font-semibold text-slate-100'>Latest appreciation</h4>
-            <p className='text-xs text-slate-400'>People who loved your recent work</p>
-          </div>
-          <div className='max-h-60 space-y-3 overflow-y-auto pr-2'>
-            {likeNotification.map(notification => (
-              <div key={notification.userId} className='flex items-center gap-3 rounded-xl border border-slate-800/60 bg-slate-950/60 px-3 py-2'>
-                <Avatar className='h-8 w-8'>
-                  <AvatarImage src={notification.userDetails?.profilePicture} />
-                  <AvatarFallback>CN</AvatarFallback>
-                </Avatar>
-                <p className='text-xs leading-4 text-slate-300'>
-                  <span className='font-semibold text-slate-100'>{notification.userDetails?.username}</span> liked your post
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </PopoverContent>
-    </Popover>
+    <span className='absolute -right-1 -top-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-rose-500 via-amber-400 to-amber-300 text-xs font-semibold text-slate-900 shadow-md shadow-rose-500/30'>
+      {likeNotification.length}
+    </span>
   )
 
   return (
