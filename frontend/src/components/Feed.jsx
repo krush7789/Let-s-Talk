@@ -1,14 +1,15 @@
-import React from 'react'
 import Posts from './Posts'
 import StoriesBar from './StoriesBar'
 import ReelsShelf from './ReelsShelf'
 
 const Feed = () => {
   return (
-    <div className='flex-1 my-8 flex flex-col gap-6 items-center pl-[20%] pr-6'>
+    <div className='flex w-full flex-col items-center gap-6'>
+      <div className='flex w-full max-w-2xl flex-col gap-6'>
         <StoriesBar />
         <ReelsShelf />
-        <Posts/>
+        <Posts />
+      </div>
     </div>
   )
 }

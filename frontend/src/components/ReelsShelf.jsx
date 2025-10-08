@@ -1,33 +1,30 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
-import ReelComposer from './ReelComposer';
-import ReelCard from './ReelCard';
+import { useSelector } from 'react-redux'
+import ReelComposer from './ReelComposer'
+import ReelCard from './ReelCard'
 
 const ReelsShelf = () => {
-    const { reels, isLoading } = useSelector(store => store.reel);
+  const { reels, isLoading } = useSelector(store => store.reel)
 
-    return (
-        <div className='w-full bg-white border border-gray-200 rounded-2xl p-4 shadow-sm flex flex-col gap-4'>
-            <div className='flex items-center justify-between'>
-                <div>
-                    <h2 className='font-semibold text-sm'>Reels</h2>
-                    <p className='text-xs text-gray-500'>Enjoy full-screen vertical videos from your network.</p>
-                </div>
-                <ReelComposer />
-            </div>
-            {
-                isLoading ? (
-                    <div className='text-center text-sm text-gray-500 py-10'>Loading reels...</div>
-                ) : reels.length === 0 ? (
-                    <div className='text-center text-sm text-gray-500 py-10'>No reels yet. Be the first to share!</div>
-                ) : (
-                    <div className='flex flex-col gap-6'>
-                        {reels.map(reel => <ReelCard key={reel._id} reel={reel} />)}
-                    </div>
-                )
-            }
+  return (
+    <div className='rounded-[2rem] border border-slate-800/60 bg-slate-900/60 p-6 shadow-xl shadow-sky-500/10 backdrop-blur-xl'>
+      <div className='mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
+        <div>
+          <h2 className='text-sm font-semibold text-slate-100'>Reels</h2>
+          <p className='text-xs text-slate-400'>Vertical stories from your creative circles.</p>
         </div>
-    );
-};
+        <ReelComposer />
+      </div>
+      {isLoading ? (
+        <div className='py-10 text-center text-sm text-slate-400'>Loading reels...</div>
+      ) : reels.length === 0 ? (
+        <div className='py-10 text-center text-sm text-slate-400'>No reels yet. Be the first to share!</div>
+      ) : (
+        <div className='flex flex-col gap-6'>
+          {reels.map(reel => <ReelCard key={reel._id} reel={reel} />)}
+        </div>
+      )}
+    </div>
+  )
+}
 
-export default ReelsShelf;
+export default ReelsShelf
