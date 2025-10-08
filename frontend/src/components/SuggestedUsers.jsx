@@ -7,6 +7,14 @@ import { Button } from './ui/button'
 const SuggestedUsers = () => {
   const { suggestedUsers, user: authUser } = useSelector(store => store.auth)
 
+  const normaliseToArray = (value) => {
+    if (!value) return []
+    if (Array.isArray(value)) return value
+    if (value instanceof Set) return Array.from(value)
+    if (typeof value === 'object') return Object.values(value)
+    return []
+  }
+
   const filteredSuggestions = useMemo(() => {
     const exclusionSet = new Set()
 
@@ -14,19 +22,19 @@ const SuggestedUsers = () => {
       exclusionSet.add(authUser._id.toString())
     }
 
-    (authUser?.following || []).forEach(id => {
+    normaliseToArray(authUser?.following).forEach(id => {
       if (id) {
         exclusionSet.add(id.toString())
       }
     })
 
-    (authUser?.sentFollowRequests || []).forEach(id => {
+    normaliseToArray(authUser?.sentFollowRequests).forEach(id => {
       if (id) {
         exclusionSet.add(id.toString())
       }
     })
 
-    return (suggestedUsers || []).filter(candidate => {
+    return normaliseToArray(suggestedUsers).filter(candidate => {
       const candidateId = candidate?._id?.toString?.() ?? candidate?._id
       if (!candidateId) return false
       return !exclusionSet.has(candidateId)
