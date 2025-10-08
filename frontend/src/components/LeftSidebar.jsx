@@ -84,7 +84,7 @@ const LeftSidebar = ({ mobileOpen, onMobileClose, createOpen, onCreateOpenChange
     { icon: <PlusSquare className='h-5 w-5' />, text: 'Create', helper: 'Share something new' },
     {
       icon: (
-        <Avatar className='h-8 w-8 border border-slate-800/80'>
+        <Avatar className='h-8 w-8 border border-[rgba(0,0,0,0.05)] bg-white'>
           <AvatarImage src={user?.profilePicture} alt={user?.username} />
           <AvatarFallback>ME</AvatarFallback>
         </Avatar>
@@ -105,7 +105,7 @@ const LeftSidebar = ({ mobileOpen, onMobileClose, createOpen, onCreateOpenChange
   }
 
   const notificationBadge = likeNotification.length > 0 && (
-    <span className='absolute -right-1 -top-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-rose-500 via-amber-400 to-amber-300 text-xs font-semibold text-slate-900 shadow-md shadow-rose-500/30'>
+    <span className='absolute -right-1 -top-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-[#c8a9f1] via-[#d5b69d] to-[#f8c8a3] text-xs font-semibold text-[#333333] shadow-sm shadow-[rgba(200,169,241,0.35)]'>
       {likeNotification.length}
     </span>
   )
@@ -114,34 +114,34 @@ const LeftSidebar = ({ mobileOpen, onMobileClose, createOpen, onCreateOpenChange
     <>
       <div
         className={cn(
-          'fixed inset-0 z-40 bg-slate-950/70 backdrop-blur-sm transition-opacity duration-300 lg:hidden',
+          'fixed inset-0 z-40 bg-black/20 backdrop-blur-sm transition-opacity duration-300 lg:hidden',
           mobileOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
         )}
         onClick={onMobileClose}
       />
       <aside
         className={cn(
-          'fixed left-3 top-3 z-50 flex h-[calc(100vh-1.5rem)] w-[calc(100%-1.5rem)] max-w-xs flex-col gap-8 overflow-hidden rounded-3xl border border-slate-800/70 bg-slate-900/85 p-6 shadow-2xl shadow-sky-500/10 ring-1 ring-white/5 transition-transform duration-300 lg:static lg:h-[calc(100vh-7rem)] lg:w-72 lg:max-w-none lg:translate-x-0 lg:rounded-[2.5rem] lg:border-slate-800/60 lg:bg-slate-900/70 lg:px-7 lg:py-8',
+          'fixed left-3 top-3 z-50 flex h-[calc(100vh-1.5rem)] w-[calc(100%-1.5rem)] max-w-xs flex-col gap-8 overflow-hidden rounded-3xl border border-[rgba(0,0,0,0.05)] bg-white/90 p-6 shadow-[0_30px_60px_-45px_rgba(51,51,51,0.65)] ring-1 ring-white/40 transition-transform duration-300 lg:static lg:h-[calc(100vh-7rem)] lg:w-72 lg:max-w-none lg:translate-x-0 lg:rounded-[2.5rem] lg:border-[rgba(0,0,0,0.05)] lg:bg-white/80 lg:px-7 lg:py-8',
           mobileOpen ? 'translate-x-0' : '-translate-x-[110%] lg:translate-x-0'
         )}
       >
-        <div className='flex flex-col gap-4 rounded-3xl border border-slate-800/60 bg-slate-950/50 p-5 shadow-inner shadow-sky-500/5'>
+        <div className='flex flex-col gap-4 rounded-3xl border border-[rgba(0,0,0,0.05)] bg-[rgba(255,255,255,0.85)] p-5 shadow-[inset_0_18px_40px_-38px_rgba(200,169,241,0.6)]'>
           <div className='flex items-center gap-3'>
-            <Avatar className='h-12 w-12 border border-slate-800/70'>
+            <Avatar className='h-12 w-12 border border-[rgba(0,0,0,0.05)] bg-white'>
               <AvatarImage src={user?.profilePicture} alt={user?.username} />
               <AvatarFallback>{user?.username?.slice(0, 2)?.toUpperCase() || 'ME'}</AvatarFallback>
             </Avatar>
             <div className='flex flex-col'>
-              <span className='text-sm font-semibold text-slate-100'>{user?.username}</span>
-              <span className='text-xs text-slate-400'>{user?.bio || 'Craft your story & inspire others'}</span>
+              <span className='text-sm font-semibold text-[#4a4a4a]'>{user?.username}</span>
+              <span className='text-xs text-[#6f6f6f]'>{user?.bio || 'Craft your story & inspire others'}</span>
             </div>
           </div>
-          <div className='rounded-2xl border border-slate-800/60 bg-gradient-to-br from-slate-950/70 via-slate-900/70 to-slate-950/70 p-4 text-xs text-slate-300 shadow-lg shadow-sky-500/5'>
-            <p className='font-medium text-slate-200'>Daily spark</p>
-            <p className='mt-1 text-slate-400'>Share something uplifting today and keep your streak alive.</p>
+          <div className='rounded-2xl border border-[rgba(0,0,0,0.04)] bg-gradient-to-br from-[#fbf7ff] via-white to-[#fff8f3] p-4 text-xs text-[#4a4a4a] shadow-[0_20px_35px_-40px_rgba(200,169,241,0.7)]'>
+            <p className='font-medium text-[#333333]'>Daily spark</p>
+            <p className='mt-1 text-[#6f6f6f]'>Share something uplifting today and keep your streak alive.</p>
             <Button
               size='sm'
-              className='mt-3 w-full justify-center bg-gradient-to-r from-sky-500 to-emerald-400 text-slate-950 hover:from-sky-400 hover:to-emerald-300'
+              className='mt-3 w-full justify-center'
               onClick={() => {
                 onCreateOpenChange?.(true)
                 onMobileClose?.()
@@ -160,17 +160,17 @@ const LeftSidebar = ({ mobileOpen, onMobileClose, createOpen, onCreateOpenChange
               className={cn(
                 'group relative flex items-center justify-between gap-3 rounded-2xl border border-transparent px-4 py-3 text-left transition-all duration-200',
                 isActive(item.text)
-                  ? 'border-sky-500/30 bg-gradient-to-r from-sky-500/15 via-emerald-400/10 to-emerald-400/20 text-sky-100 shadow-lg shadow-sky-500/20'
-                  : 'text-slate-300 hover:border-slate-700/70 hover:bg-slate-900/70 hover:text-slate-100'
+                  ? 'border-[#c8a9f1]/60 bg-gradient-to-r from-[#c8a9f1]/35 via-[#e8d6c6]/30 to-[#f8c8a3]/40 text-[#4a4a4a] shadow-[0_18px_42px_-32px_rgba(200,169,241,0.8)]'
+                  : 'text-[#4a4a4a] hover:border-[rgba(0,0,0,0.06)] hover:bg-white/80 hover:text-[#333333]'
               )}
             >
               <div className='flex items-center gap-3'>
-                <span className={cn('flex h-9 w-9 items-center justify-center rounded-2xl bg-slate-900/60 text-slate-300 transition-colors duration-200', isActive(item.text) && 'bg-sky-500/20 text-sky-200 shadow-inner shadow-sky-500/20')}>
+                <span className={cn('flex h-9 w-9 items-center justify-center rounded-2xl bg-white/70 text-[#b8b8b8] transition-colors duration-200 shadow-[inset_0_8px_18px_-20px_rgba(0,0,0,0.5)]', isActive(item.text) && 'bg-white text-[#4a4a4a] shadow-[inset_0_0_0_1px_rgba(200,169,241,0.6)]')}>
                   {item.icon}
                 </span>
                 <div className='flex flex-col'>
                   <span className='text-sm font-medium'>{item.text}</span>
-                  <span className='text-[11px] text-slate-500 group-hover:text-slate-400'>{item.helper}</span>
+                  <span className='text-[11px] text-[#8c8c8c] group-hover:text-[#666666]'>{item.helper}</span>
                 </div>
               </div>
               {item.text === 'Notifications' && notificationBadge}
@@ -178,13 +178,13 @@ const LeftSidebar = ({ mobileOpen, onMobileClose, createOpen, onCreateOpenChange
           ))}
         </nav>
 
-        <div className='rounded-3xl border border-slate-800/60 bg-slate-950/40 p-5 text-xs text-slate-400 shadow-inner shadow-sky-500/5'>
+        <div className='rounded-3xl border border-[rgba(0,0,0,0.05)] bg-white/75 p-5 text-xs text-[#6f6f6f] shadow-[inset_0_18px_36px_-40px_rgba(0,0,0,0.45)]'>
           <div className='flex items-start gap-3'>
-            <div className='rounded-2xl bg-sky-500/20 p-2 text-sky-200'>
+            <div className='rounded-2xl bg-[#c8a9f1]/30 p-2 text-[#c8a9f1]'>
               <Sparkles className='h-4 w-4' />
             </div>
             <div className='space-y-2'>
-              <p className='font-semibold text-slate-100'>Need a spark?</p>
+              <p className='font-semibold text-[#333333]'>Need a spark?</p>
               <p>Jump into Explore to find creators and conversations tailored for you.</p>
             </div>
           </div>

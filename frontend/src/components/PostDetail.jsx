@@ -32,34 +32,34 @@ const PostDetail = () => {
   }
 
   return (
-    <div className='mx-auto flex w-full max-w-4xl flex-col gap-6 rounded-[2.5rem] border border-slate-800/60 bg-slate-900/70 p-6 shadow-xl shadow-sky-500/10 backdrop-blur-xl'>
+    <div className='mx-auto flex w-full max-w-4xl flex-col gap-6 rounded-[2.5rem] border border-[rgba(0,0,0,0.05)] bg-white/80 p-6 text-[#4a4a4a] shadow-[0_30px_80px_-60px_rgba(51,51,51,0.55)] backdrop-blur-xl'>
       <div className='flex items-center justify-between gap-4'>
         <Button
-          variant='ghost'
+          variant='outline'
           onClick={goBack}
-          className='flex items-center gap-2 rounded-full border border-slate-800/70 bg-slate-950/50 px-4 text-sm text-slate-200 hover:bg-slate-900/70'
+          className='flex items-center gap-2 rounded-full border border-[rgba(0,0,0,0.08)] bg-white/80 px-4 text-sm text-[#4a4a4a] hover:bg-white'
         >
           <ArrowLeft className='h-4 w-4' />
           Back
         </Button>
         <Button
-          variant='ghost'
-          className='flex items-center gap-2 rounded-full border border-slate-800/70 bg-slate-950/50 px-4 text-sm text-slate-200 hover:bg-slate-900/70'
+          variant='outline'
+          className='flex items-center gap-2 rounded-full border border-[rgba(0,0,0,0.08)] bg-white/80 px-4 text-sm text-[#4a4a4a] hover:bg-white'
           onClick={() => navigate('/explore')}
         >
-          <Compass className='h-4 w-4 text-sky-300' />
+          <Compass className='h-4 w-4 text-[#c8a9f1]' />
           Explore more
         </Button>
       </div>
 
       {!posts.length && (
-        <div className='rounded-3xl border border-slate-800/60 bg-slate-950/60 p-10 text-center text-sm text-slate-400'>
+        <div className='rounded-3xl border border-[rgba(0,0,0,0.05)] bg-white/70 p-10 text-center text-sm text-[#6f6f6f]'>
           Fetching the latest vibes for you...
         </div>
       )}
 
       {posts.length > 0 && !post && (
-        <div className='rounded-3xl border border-slate-800/60 bg-slate-950/60 p-10 text-center text-sm text-slate-400'>
+        <div className='rounded-3xl border border-[rgba(0,0,0,0.05)] bg-white/70 p-10 text-center text-sm text-[#6f6f6f]'>
           This post is no longer available. Discover new stories in Explore!
         </div>
       )}

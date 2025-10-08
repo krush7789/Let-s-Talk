@@ -64,21 +64,21 @@ const Notifications = () => {
   }
 
   return (
-    <div className='mx-auto flex w-full max-w-4xl flex-col gap-8 rounded-[2.5rem] border border-slate-800/60 bg-slate-900/60 p-8 shadow-xl shadow-sky-500/10 backdrop-blur-xl'>
+    <div className='mx-auto flex w-full max-w-4xl flex-col gap-8 rounded-[2.5rem] border border-[rgba(0,0,0,0.05)] bg-white/80 p-8 text-[#4a4a4a] shadow-[0_32px_80px_-60px_rgba(51,51,51,0.6)] backdrop-blur-xl'>
       <header className='flex flex-wrap items-center justify-between gap-4'>
         <div>
-          <h1 className='text-3xl font-semibold text-slate-50'>Notifications</h1>
-          <p className='text-sm text-slate-400'>Stay in the loop with the latest reactions and follows.</p>
+          <h1 className='text-3xl font-semibold text-[#333333]'>Notifications</h1>
+          <p className='text-sm text-[#6f6f6f]'>Stay in the loop with the latest reactions and follows.</p>
         </div>
         <div className='flex items-center gap-3'>
-          <div className='flex items-center gap-2 rounded-full border border-slate-800/70 bg-slate-950/50 px-4 py-2 text-xs uppercase tracking-wide text-slate-400'>
-            <BellRing className='h-4 w-4 text-emerald-300' />
+          <div className='flex items-center gap-2 rounded-full border border-[rgba(0,0,0,0.05)] bg-white/80 px-4 py-2 text-xs uppercase tracking-wide text-[#8c8c8c] shadow-[0_16px_30px_-28px_rgba(200,169,241,0.6)]'>
+            <BellRing className='h-4 w-4 text-[#c8a9f1]' />
             Live sync
           </div>
           <Button
             variant='secondary'
             onClick={markAllAsRead}
-            className='flex items-center gap-2 rounded-full border-slate-800/70 bg-slate-900/60 text-xs font-semibold uppercase tracking-wide text-slate-200 hover:border-slate-700 hover:bg-slate-900'
+            className='flex items-center gap-2 rounded-full text-xs font-semibold uppercase tracking-wide'
             disabled={!likeNotification.length}
           >
             <RefreshCw className='h-4 w-4' />
@@ -97,21 +97,21 @@ const Notifications = () => {
             return (
             <article
               key={derivedKey}
-              className='flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-slate-800/60 bg-slate-950/50 p-5 shadow-inner shadow-sky-500/5'
+              className='flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-[rgba(0,0,0,0.05)] bg-white/80 p-5 shadow-[0_24px_60px_-48px_rgba(51,51,51,0.45)]'
             >
               <div className='flex items-center gap-4'>
                 <div className='relative'>
-                  <Avatar className='h-12 w-12 border border-slate-900'>
+                  <Avatar className='h-12 w-12 border border-[rgba(0,0,0,0.05)] bg-white'>
                     <AvatarImage src={primaryUser?.profilePicture} alt={primaryUser?.username} />
                     <AvatarFallback>{primaryUser?.username?.slice(0, 2)?.toUpperCase() || 'NS'}</AvatarFallback>
                   </Avatar>
-                  <span className='absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-[10px] font-semibold text-white shadow shadow-rose-500/40'>
+                  <span className='absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#d66c6c] text-[10px] font-semibold text-white shadow shadow-[rgba(214,108,108,0.35)]'>
                     <Heart className='h-3 w-3' />
                   </span>
                 </div>
                 <div className='flex flex-col'>
-                  <p className='text-sm text-slate-200'>{buildMessage(notification)}</p>
-                  <span className='text-xs text-slate-500'>
+                  <p className='text-sm text-[#4a4a4a]'>{buildMessage(notification)}</p>
+                  <span className='text-xs text-[#8c8c8c]'>
                     {notification.count > 1 ? `${notification.count} interactions` : 'Just now'}
                   </span>
                 </div>
@@ -124,14 +124,14 @@ const Notifications = () => {
                     className='h-16 w-16 rounded-2xl object-cover'
                   />
                 ) : (
-                  <span className='flex h-16 w-16 items-center justify-center rounded-2xl border border-slate-800/70 bg-slate-900/60 text-slate-500'>
+                  <span className='flex h-16 w-16 items-center justify-center rounded-2xl border border-[rgba(0,0,0,0.05)] bg-white/70 text-[#b8b8b8]'>
                     <ImageIcon className='h-5 w-5' />
                   </span>
                 )}
                 <div className='flex items-center gap-2'>
                   <Button
                     variant='secondary'
-                    className='rounded-full border-slate-800/70 bg-slate-900/60 text-xs font-semibold uppercase tracking-wide text-slate-200 hover:border-slate-700 hover:bg-slate-900'
+                    className='rounded-full text-xs font-semibold uppercase tracking-wide'
                     onClick={() => handleViewPost(notification.postId)}
                     disabled={!notification.postId}
                   >
@@ -139,7 +139,7 @@ const Notifications = () => {
                   </Button>
                   <Button
                     variant='ghost'
-                    className='rounded-full border border-transparent text-xs font-semibold uppercase tracking-wide text-slate-400 hover:border-slate-800/70 hover:bg-slate-900/60 hover:text-slate-200'
+                    className='rounded-full border border-transparent text-xs font-semibold uppercase tracking-wide text-[#8c8c8c] hover:text-[#333333]'
                     onClick={() => dispatch(dismissNotification(derivedKey))}
                   >
                     Mark read
@@ -147,13 +147,13 @@ const Notifications = () => {
                 </div>
               </div>
             </article>
-            )
-          })
-        ) : (
-          <div className='rounded-3xl border border-slate-800/60 bg-slate-950/50 p-12 text-center text-sm text-slate-400'>
-            You&apos;re all caught up. Start engaging with others to see activity here!
-          </div>
-        )}
+          )
+        })
+      ) : (
+        <div className='rounded-3xl border border-[rgba(0,0,0,0.05)] bg-white/70 p-12 text-center text-sm text-[#6f6f6f] shadow-[0_24px_60px_-48px_rgba(51,51,51,0.45)]'>
+          You&apos;re all caught up. Start engaging with others to see activity here!
+        </div>
+      )}
       </section>
     </div>
   )

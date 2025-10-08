@@ -3,17 +3,35 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
+  --color-background: #f6f6f6;
+  --color-surface: #ffffff;
+  --color-surface-subtle: #fbf7ff;
+  --color-primary-start: #c8a9f1;
+  --color-primary-end: #f8c8a3;
+  --color-accent: #d5b69d;
+  --color-accent-soft: #e8d6c6;
+  --color-text: #333333;
+  --color-text-muted: #4a4a4a;
+  --color-divider: rgba(0, 0, 0, 0.05);
+  --color-shadow: rgba(0, 0, 0, 0.08);
 }
 
 body {
-  @apply bg-slate-950 text-slate-100 antialiased;
+  background: var(--color-background);
+  color: var(--color-text);
   font-family: "Inter", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
 }
 
 a {
-  @apply text-sky-300 hover:text-sky-200 transition-colors;
+  color: var(--color-accent);
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--color-primary-start);
 }
 
 ::-webkit-scrollbar {
@@ -22,14 +40,14 @@ a {
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.4);
+  background: rgba(0, 0, 0, 0.05);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(94, 234, 212, 0.35);
+  background: rgba(197, 169, 226, 0.55);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(94, 234, 212, 0.6);
+  background: rgba(213, 182, 157, 0.8);
 }

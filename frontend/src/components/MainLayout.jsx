@@ -11,43 +11,40 @@ const MainLayout = () => {
   const navigate = useNavigate()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100">
+    <div className="min-h-screen bg-gradient-to-br from-[#c8a9f1]/35 via-[#f6f6f6] to-[#f8c8a3]/25 text-[#333333]">
       <div className="relative isolate">
         <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-          <div className="absolute left-1/2 top-[-10%] h-[480px] w-[480px] -translate-x-1/2 rounded-full bg-sky-500/30 blur-3xl" />
-          <div className="absolute right-[10%] bottom-[-15%] h-[420px] w-[420px] rounded-full bg-emerald-400/20 blur-[140px]" />
+          <div className="absolute left-1/2 top-[-12%] h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-gradient-to-br from-[#c8a9f1]/30 via-transparent to-[#f8c8a3]/20 blur-[140px]" />
+          <div className="absolute right-[8%] bottom-[-18%] h-[480px] w-[480px] rounded-full bg-gradient-to-br from-[#f8c8a3]/25 via-transparent to-[#c8a9f1]/20 blur-[160px]" />
         </div>
-        <header className="sticky top-0 z-30 border-b border-slate-800/60 bg-slate-950/70 backdrop-blur-xl">
+        <header className="sticky top-0 z-30 border-b border-[rgba(0,0,0,0.05)] bg-white/85 backdrop-blur-xl shadow-[0_8px_30px_-25px_rgba(51,51,51,0.45)]">
           <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-10">
             <div className="flex items-center gap-3">
               <Button
                 variant="secondary"
                 size="icon"
-                className="lg:hidden bg-slate-900/80 text-slate-100 border border-slate-800/80"
+                className="lg:hidden border border-[rgba(0,0,0,0.08)] bg-white/80 text-[#4a4a4a] shadow-sm"
                 onClick={() => setMobileSidebarOpen(true)}
               >
                 <Menu className="h-5 w-5" />
               </Button>
-              <div className="flex items-center gap-2 rounded-full border border-slate-800/70 bg-slate-900/70 px-4 py-2 shadow-lg shadow-sky-500/5">
-                <Sparkles className="h-5 w-5 text-emerald-300" />
-                <span className="font-semibold tracking-tight text-slate-50">NovaSphere</span>
+              <div className="flex items-center gap-2 rounded-full border border-[rgba(0,0,0,0.05)] bg-white/80 px-4 py-2 shadow-[0_20px_45px_-40px_rgba(200,169,241,0.8)]">
+                <Sparkles className="h-5 w-5 text-[#c8a9f1]" />
+                <span className="font-semibold tracking-tight text-[#4a4a4a]">NovaSphere</span>
               </div>
             </div>
             <div className="hidden flex-1 items-center gap-2 lg:flex">
               <div className="relative w-full max-w-md">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#b8b8b8]" />
                 <Input
                   placeholder="Search people, tags, or spaces"
-                  className="w-full border-slate-800 bg-slate-900/70 pl-10 text-slate-100 placeholder:text-slate-500"
+                  className="w-full border-[rgba(0,0,0,0.06)] bg-white/90 pl-10 text-[#333333] placeholder:text-[#b8b8b8]"
                   onFocus={() => navigate('/search')}
                 />
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Button
-                onClick={() => setCreatePostOpen(true)}
-                className="hidden bg-gradient-to-r from-sky-500 to-emerald-400 text-slate-950 shadow-lg shadow-sky-500/40 hover:from-sky-400 hover:to-emerald-300 lg:inline-flex"
-              >
+              <Button onClick={() => setCreatePostOpen(true)} className="hidden lg:inline-flex">
                 Share a moment
               </Button>
             </div>

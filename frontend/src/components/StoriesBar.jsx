@@ -7,13 +7,13 @@ import StoryViewer from './StoryViewer'
 const StoryBubble = ({ story, label, onClick }) => {
   return (
     <button onClick={() => onClick(story)} className='flex flex-col items-center gap-2 focus:outline-none'>
-      <div className='rounded-full bg-gradient-to-tr from-sky-500 via-emerald-400 to-indigo-500 p-[2px] transition hover:scale-105'>
-        <Avatar className='h-16 w-16 border-4 border-slate-950/80'>
+      <div className='rounded-full bg-gradient-to-tr from-[#c8a9f1] via-[#e8d6c6] to-[#f8c8a3] p-[2px] transition hover:scale-105'>
+        <Avatar className='h-16 w-16 border-4 border-white/70 bg-white'>
           <AvatarImage src={story?.owner?.profilePicture} alt={story?.owner?.username} />
           <AvatarFallback>ST</AvatarFallback>
         </Avatar>
       </div>
-      <span className='text-xs text-slate-400'>{label}</span>
+      <span className='text-xs text-[#8c8c8c]'>{label}</span>
     </button>
   )
 }
@@ -35,18 +35,18 @@ const StoriesBar = () => {
   }
 
   return (
-    <div className='rounded-[2rem] border border-slate-800/60 bg-slate-900/60 p-6 shadow-xl shadow-sky-500/10 backdrop-blur-xl'>
+    <div className='rounded-[2rem] border border-[rgba(0,0,0,0.05)] bg-white/80 p-6 text-[#4a4a4a] shadow-[0_24px_60px_-48px_rgba(51,51,51,0.45)] backdrop-blur-xl'>
       <div className='mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
         <div>
-          <h2 className='text-sm font-semibold text-slate-100'>Stories</h2>
-          <p className='text-xs text-slate-400'>Capture a 24-hour highlight for your circle.</p>
+          <h2 className='text-sm font-semibold text-[#333333]'>Stories</h2>
+          <p className='text-xs text-[#8c8c8c]'>Capture a 24-hour highlight for your circle.</p>
         </div>
         <div className='w-full sm:w-40'>
           <StoryComposer />
         </div>
       </div>
       {isLoading ? (
-        <div className='py-6 text-center text-sm text-slate-400'>Loading stories...</div>
+        <div className='py-6 text-center text-sm text-[#8c8c8c]'>Loading stories...</div>
       ) : (
         <div className='flex gap-4 overflow-x-auto pb-2'>
           {myStories.length > 0 ? (
@@ -59,8 +59,8 @@ const StoriesBar = () => {
               />
             ))
           ) : (
-            <div className='flex flex-col items-center justify-center text-xs text-slate-500'>
-              <Avatar className='mb-1 h-16 w-16 border border-slate-900'>
+            <div className='flex flex-col items-center justify-center text-xs text-[#8c8c8c]'>
+              <Avatar className='mb-1 h-16 w-16 border border-[rgba(0,0,0,0.05)] bg-white'>
                 <AvatarImage src={user?.profilePicture} />
                 <AvatarFallback>YOU</AvatarFallback>
               </Avatar>

@@ -22,29 +22,29 @@ const FollowRequests = () => {
   if (!followRequests?.length) return null
 
   return (
-    <div className='rounded-2xl border border-slate-800/60 bg-slate-950/40 p-5 shadow-inner shadow-sky-500/5'>
+    <div className='rounded-2xl border border-[rgba(0,0,0,0.05)] bg-white/75 p-5 shadow-[0_22px_45px_-42px_rgba(200,169,241,0.6)]'>
       <div className='mb-4 flex items-center justify-between'>
-        <h2 className='text-sm font-semibold text-slate-100'>Follow requests</h2>
-        <span className='rounded-full bg-slate-900/70 px-2 py-0.5 text-xs text-slate-400'>{followRequests.length}</span>
+        <h2 className='text-sm font-semibold text-[#333333]'>Follow requests</h2>
+        <span className='rounded-full bg-[#f0e9ff] px-2 py-0.5 text-xs text-[#6f6f6f]'>{followRequests.length}</span>
       </div>
       <div className='flex flex-col gap-4'>
         {followRequests.map(request => (
-          <div key={request._id} className='flex items-center justify-between gap-3 rounded-xl border border-slate-800/60 bg-slate-900/60 px-4 py-3'>
+          <div key={request._id} className='flex items-center justify-between gap-3 rounded-xl border border-[rgba(0,0,0,0.05)] bg-white/80 px-4 py-3 shadow-[0_12px_28px_-36px_rgba(0,0,0,0.45)]'>
             <div className='flex items-center gap-3'>
-              <Avatar className='h-10 w-10 border border-slate-900'>
+              <Avatar className='h-10 w-10 border border-[rgba(0,0,0,0.05)] bg-white'>
                 <AvatarImage src={request.profilePicture} />
                 <AvatarFallback>RQ</AvatarFallback>
               </Avatar>
               <div className='flex flex-col'>
-                <span className='text-sm font-semibold text-slate-100'>{request.username}</span>
-                <span className='text-xs text-slate-400'>{request.bio || 'Wants to follow you'}</span>
+                <span className='text-sm font-semibold text-[#333333]'>{request.username}</span>
+                <span className='text-xs text-[#8c8c8c]'>{request.bio || 'Wants to follow you'}</span>
               </div>
             </div>
             <div className='flex items-center gap-2'>
-              <Button size='sm' className='bg-emerald-400/90 text-slate-950 hover:bg-emerald-300' onClick={() => handleRespond(request._id, 'accept')}>
+              <Button size='sm' className='px-4' onClick={() => handleRespond(request._id, 'accept')}>
                 Confirm
               </Button>
-              <Button size='sm' variant='outline' className='border-slate-700/80 text-slate-300 hover:bg-slate-900/80' onClick={() => handleRespond(request._id, 'decline')}>
+              <Button size='sm' variant='outline' className='border-[rgba(0,0,0,0.08)] text-[#6f6f6f] hover:bg-white/80' onClick={() => handleRespond(request._id, 'decline')}>
                 Delete
               </Button>
             </div>
