@@ -1,9 +1,11 @@
 import { useMemo, useState } from 'react'
-import { Compass, Film, Hash, ImageIcon, TrendingUp } from 'lucide-react'
+import { Compass, Film, Hash, ImageIcon, PlayCircle, TrendingUp } from 'lucide-react'
 import { useSelector } from 'react-redux'
 import useGetAllPost from '@/hooks/useGetAllPost'
 import useReels from '@/hooks/useReels'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
+import { Link } from 'react-router-dom'
+import ReelPlayerDialog from './ReelPlayerDialog'
 
 const FILTERS = [
   { id: 'all', label: 'All', icon: Compass },
@@ -16,6 +18,7 @@ const Explore = () => {
   useReels()
 
   const [activeFilter, setActiveFilter] = useState('all')
+  const [activeReel, setActiveReel] = useState(null)
   const { posts } = useSelector(store => store.post)
   const { reels } = useSelector(store => store.reel)
 
@@ -78,8 +81,9 @@ const Explore = () => {
       <div className='grid gap-8 lg:grid-cols-[1fr_280px]'>
         <div className='grid gap-6 sm:grid-cols-2 xl:grid-cols-3'>
           {trendingPosts.map(post => (
-            <article
+            <Link
               key={post._id}
+              to={`/p/${post._id}`}
               className='group overflow-hidden rounded-3xl border border-slate-800/60 bg-slate-950/50 shadow-lg shadow-sky-500/10 transition hover:border-slate-700 hover:shadow-sky-500/20'
             >
               <div className='relative'>
@@ -87,19 +91,21 @@ const Explore = () => {
                 <div className='absolute inset-0 flex items-end justify-between bg-gradient-to-t from-slate-950/80 via-transparent to-transparent p-4 opacity-0 transition group-hover:opacity-100'>
                   <div>
                     <p className='text-sm font-semibold text-slate-50'>{post.author?.username}</p>
-                    <p className='text-xs text-slate-300'>{post.caption}</p>
+                    <p className='text-xs text-slate-300 line-clamp-2'>{post.caption}</p>
                   </div>
                   <div className='rounded-full bg-slate-900/80 px-3 py-1 text-xs text-slate-200'>
                     {post.likes.length} likes
                   </div>
                 </div>
               </div>
-            </article>
+            </Link>
           ))}
 
           {trendingReels.map(reel => (
-            <article
+            <button
               key={reel._id}
+              type='button'
+              onClick={() => setActiveReel(reel)}
               className='group overflow-hidden rounded-3xl border border-violet-500/30 bg-slate-950/50 shadow-lg shadow-violet-500/20 transition hover:border-violet-400/50 hover:shadow-violet-500/30'
             >
               <div className='relative'>
@@ -121,12 +127,18 @@ const Explore = () => {
                       <span className='text-xs text-slate-300'>{reel.views?.length || 0} views</span>
                     </div>
                   </div>
-                  <div className='rounded-full bg-slate-900/80 px-3 py-1 text-xs text-slate-200'>
-                    {reel.likes?.length || 0} likes
+                  <div className='flex items-center justify-between'>
+                    <div className='rounded-full bg-slate-900/80 px-3 py-1 text-xs text-slate-200'>
+                      {reel.likes?.length || 0} likes
+                    </div>
+                    <span className='inline-flex items-center gap-2 rounded-full bg-violet-500/20 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-violet-200'>
+                      <PlayCircle className='h-4 w-4' />
+                      Watch
+                    </span>
                   </div>
                 </div>
               </div>
-            </article>
+            </button>
           ))}
 
           {!trendingPosts.length && !trendingReels.length && (
@@ -158,6 +170,16 @@ const Explore = () => {
           </div>
         </aside>
       </div>
+
+      <ReelPlayerDialog
+        reel={activeReel}
+        open={Boolean(activeReel)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setActiveReel(null)
+          }
+        }}
+      />
     </div>
   )
 }

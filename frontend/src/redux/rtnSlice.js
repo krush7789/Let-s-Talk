@@ -15,9 +15,14 @@ const rtnSlice = createSlice({
     },
     clearNotifications: (state) => {
       state.likeNotification = []
+    },
+    dismissNotification: (state, action) => {
+      state.likeNotification = state.likeNotification.filter(
+        (notification) => (notification.postId || notification.userId) !== action.payload
+      )
     }
   }
 })
 
-export const { setLikeNotification, clearNotifications } = rtnSlice.actions
+export const { setLikeNotification, clearNotifications, dismissNotification } = rtnSlice.actions
 export default rtnSlice.reducer

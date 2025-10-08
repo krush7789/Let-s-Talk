@@ -6,6 +6,7 @@ import Home from './components/Home'
 import Login from './components/Login'
 import MainLayout from './components/MainLayout'
 import Notifications from './components/Notifications'
+import PostDetail from './components/PostDetail'
 import Profile from './components/Profile'
 import Search from './components/Search'
 import Signup from './components/Signup'
@@ -42,6 +43,10 @@ const browserRouter = createBrowserRouter([
       {
         path: '/notifications',
         element: <ProtectedRoutes><Notifications /></ProtectedRoutes>
+      },
+      {
+        path: '/p/:id',
+        element: <ProtectedRoutes><PostDetail /></ProtectedRoutes>
       },
       {
         path: '/account/edit',
