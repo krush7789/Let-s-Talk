@@ -1,23 +1,26 @@
-import { useEffect } from 'react'
-import ChatPage from './components/ChatPage'
-import EditProfile from './components/EditProfile'
-import Home from './components/Home'
-import Login from './components/Login'
-import MainLayout from './components/MainLayout'
-import Profile from './components/Profile'
-import Signup from './components/Signup'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import { io } from "socket.io-client";
-import { useDispatch, useSelector } from 'react-redux'
-import { setSocket } from './redux/socketSlice'
-import { setOnlineUsers } from './redux/chatSlice'
-import { setLikeNotification } from './redux/rtnSlice'
-import ProtectedRoutes from './components/ProtectedRoutes'
-
+import { useEffect } from 'react';
+import ChatPage from './components/ChatPage';
+import EditProfile from './components/EditProfile';
+import Home from './components/Home';
+import Login from './components/Login';
+import MainLayout from './components/MainLayout';
+import Profile from './components/Profile';
+import Signup from './components/Signup';
+import Search from './components/Search';
+import Explore from './components/Explore';
+import ExploreReels from './components/ExploreReels';
+import TagFeed from './components/TagFeed';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { io } from 'socket.io-client';
+import { useDispatch, useSelector } from 'react-redux';
+import { setSocket } from './redux/socketSlice';
+import { setOnlineUsers } from './redux/chatSlice';
+import { setLikeNotification } from './redux/rtnSlice';
+import ProtectedRoutes from './components/ProtectedRoutes';
 
 const browserRouter = createBrowserRouter([
   {
-    path: "/",
+    path: '/',
     element: <ProtectedRoutes><MainLayout /></ProtectedRoutes>,
     children: [
       {
@@ -25,8 +28,24 @@ const browserRouter = createBrowserRouter([
         element: <ProtectedRoutes><Home /></ProtectedRoutes>
       },
       {
+        path: '/search',
+        element: <ProtectedRoutes><Search /></ProtectedRoutes>
+      },
+      {
+        path: '/explore',
+        element: <ProtectedRoutes><Explore /></ProtectedRoutes>
+      },
+      {
+        path: '/reels',
+        element: <ProtectedRoutes><ExploreReels /></ProtectedRoutes>
+      },
+      {
+        path: '/tags/:tag',
+        element: <ProtectedRoutes><TagFeed /></ProtectedRoutes>
+      },
+      {
         path: '/profile/:id',
-        element: <ProtectedRoutes> <Profile /></ProtectedRoutes>
+        element: <ProtectedRoutes><Profile /></ProtectedRoutes>
       },
       {
         path: '/account/edit',
@@ -46,7 +65,7 @@ const browserRouter = createBrowserRouter([
     path: '/signup',
     element: <Signup />
   },
-])
+]);
 
 function App() {
   const { user } = useSelector(store => store.auth);
@@ -63,7 +82,6 @@ function App() {
       });
       dispatch(setSocket(socketio));
 
-      // listen all the events
       socketio.on('getOnlineUsers', (onlineUsers) => {
         dispatch(setOnlineUsers(onlineUsers));
       });
@@ -75,18 +93,19 @@ function App() {
       return () => {
         socketio.close();
         dispatch(setSocket(null));
-      }
+      };
     } else if (socket) {
       socket.close();
       dispatch(setSocket(null));
     }
-  }, [user, dispatch]);
+  }, [user, socket, dispatch]);
 
   return (
     <>
       <RouterProvider router={browserRouter} />
     </>
-  )
+  );
 }
 
-export default App
+export default App;
+

@@ -11,7 +11,8 @@ const Signup = () => {
     const [input, setInput] = useState({
         username: "",
         email: "",
-        password: ""
+        password: "",
+        accountType: 'public'
     });
     const [loading, setLoading] = useState(false);
     const {user} = useSelector(store=>store.auth);
@@ -37,7 +38,8 @@ const Signup = () => {
                 setInput({
                     username: "",
                     email: "",
-                    password: ""
+                    password: "",
+                    accountType: 'public'
                 });
             }
         } catch (error) {
@@ -89,6 +91,18 @@ const Signup = () => {
                         onChange={changeEventHandler}
                         className="focus-visible:ring-transparent my-2"
                     />
+                </div>
+                <div>
+                    <span className='font-medium'>Account type</span>
+                    <select
+                        name="accountType"
+                        value={input.accountType}
+                        onChange={changeEventHandler}
+                        className='w-full border rounded-md py-2 px-3 text-sm outline-none'
+                    >
+                        <option value='public'>Public</option>
+                        <option value='private'>Private</option>
+                    </select>
                 </div>
                 {
                     loading ? (
