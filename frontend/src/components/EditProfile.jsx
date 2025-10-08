@@ -17,7 +17,8 @@ const EditProfile = () => {
     const [input, setInput] = useState({
         profilePhoto: user?.profilePicture,
         bio: user?.bio,
-        gender: user?.gender
+        gender: user?.gender,
+        accountType: user?.accountType || 'public'
     });
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -35,8 +36,9 @@ const EditProfile = () => {
     const editProfileHandler = async () => {
         console.log(input);
         const formData = new FormData();
-        formData.append("bio", input.bio);
-        formData.append("gender", input.gender);
+        formData.append("bio", input.bio ?? "");
+        formData.append("gender", input.gender ?? "");
+        formData.append("accountType", input.accountType);
         if(input.profilePhoto){
             formData.append("profilePhoto", input.profilePhoto);
         }
@@ -53,7 +55,8 @@ const EditProfile = () => {
                     ...user,
                     bio:res.data.user?.bio,
                     profilePicture:res.data.user?.profilePicture,
-                    gender:res.data.user.gender
+                    gender:res.data.user.gender,
+                    accountType:res.data.user?.accountType
                 };
                 dispatch(setAuthUser(updatedUserData));
                 navigate(`/profile/${user?._id}`);
@@ -99,6 +102,20 @@ const EditProfile = () => {
                             <SelectGroup>
                                 <SelectItem value="male">Male</SelectItem>
                                 <SelectItem value="female">Female</SelectItem>
+                            </SelectGroup>
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div>
+                    <h1 className='font-bold mb-2'>Account privacy</h1>
+                    <Select value={input.accountType} onValueChange={(value) => setInput(prev => ({ ...prev, accountType: value }))}>
+                        <SelectTrigger className="w-full">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectGroup>
+                                <SelectItem value="public">Public</SelectItem>
+                                <SelectItem value="private">Private</SelectItem>
                             </SelectGroup>
                         </SelectContent>
                     </Select>

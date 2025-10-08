@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import useGetUserProfile from '@/hooks/useGetUserProfile';
 import { Link, useParams } from 'react-router-dom';
@@ -6,23 +6,51 @@ import { useSelector } from 'react-redux';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { AtSign, Heart, MessageCircle } from 'lucide-react';
+import axios from 'axios';
+import { toast } from 'sonner';
 
 const Profile = () => {
   const params = useParams();
   const userId = params.id;
-  useGetUserProfile(userId);
+  const { refetch } = useGetUserProfile(userId);
   const [activeTab, setActiveTab] = useState('posts');
 
-  const { userProfile, user } = useSelector(store => store.auth);
+  useEffect(() => {
+    setActiveTab('posts');
+  }, [userId]);
+
+  const { userProfile, user, userProfileMeta } = useSelector(store => store.auth);
 
   const isLoggedInUserProfile = user?._id === userProfile?._id;
-  const isFollowing = false;
+  const isFollowing = userProfileMeta?.isFollowing;
+  const hasPendingRequest = userProfileMeta?.hasPendingRequest;
+  const canViewProfile = userProfileMeta?.canViewFullProfile || isLoggedInUserProfile;
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
   }
 
   const displayedPost = activeTab === 'posts' ? userProfile?.posts : userProfile?.bookmarks;
+
+  const handleFollowAction = async () => {
+    try {
+      const res = await axios.post(`https://let-s-talk-lq7h.onrender.com/api/v1/user/followorunfollow/${userId}`, {}, { withCredentials: true });
+      if(res.data.success){
+        toast.success(res.data.message);
+        await refetch();
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error?.response?.data?.message || 'Something went wrong');
+    }
+  };
+
+  const followButtonLabel = useMemo(() => {
+    if(isLoggedInUserProfile) return null;
+    if(isFollowing) return 'Unfollow';
+    if(hasPendingRequest) return 'Requested';
+    return 'Follow';
+  }, [isFollowing, hasPendingRequest, isLoggedInUserProfile]);
 
   return (
     <div className='flex max-w-5xl justify-center mx-auto pl-10'>
@@ -46,14 +74,23 @@ const Profile = () => {
                       <Button variant='secondary' className='hover:bg-gray-200 h-8'>Ad tools</Button>
                     </>
                   ) : (
-                    isFollowing ? (
-                      <>
-                        <Button variant='secondary' className='h-8'>Unfollow</Button>
+                    <>
+                      {
+                        followButtonLabel && (
+                          <Button
+                            disabled={followButtonLabel === 'Requested'}
+                            onClick={followButtonLabel === 'Requested' ? undefined : handleFollowAction}
+                            className={`h-8 ${followButtonLabel === 'Follow' ? 'bg-[#0095F6] hover:bg-[#3192d2]' : ''}`}
+                            variant={followButtonLabel === 'Unfollow' ? 'secondary' : 'default'}
+                          >
+                            {followButtonLabel}
+                          </Button>
+                        )
+                      }
+                      {isFollowing && (
                         <Button variant='secondary' className='h-8'>Message</Button>
-                      </>
-                    ) : (
-                      <Button className='bg-[#0095F6] hover:bg-[#3192d2] h-8'>Follow</Button>
-                    )
+                      )}
+                    </>
                   )
                 }
               </div>
@@ -64,7 +101,12 @@ const Profile = () => {
               </div>
               <div className='flex flex-col gap-1'>
                 <span className='font-semibold'>{userProfile?.bio || 'bio here...'}</span>
-                <Badge className='w-fit' variant='secondary'><AtSign /> <span className='pl-1'>{userProfile?.username}</span> </Badge>
+                <div className='flex items-center gap-2'>
+                  <Badge className='w-fit' variant='secondary'><AtSign /> <span className='pl-1'>{userProfile?.username}</span> </Badge>
+                  <Badge variant={userProfile?.accountType === 'private' ? 'destructive' : 'outline'}>
+                    {userProfile?.accountType === 'private' ? 'Private account' : 'Public account'}
+                  </Badge>
+                </div>
               </div>
             </div>
           </section>
@@ -74,35 +116,46 @@ const Profile = () => {
             <span className={`py-3 cursor-pointer ${activeTab === 'posts' ? 'font-bold' : ''}`} onClick={() => handleTabChange('posts')}>
               POSTS
             </span>
-            <span className={`py-3 cursor-pointer ${activeTab === 'saved' ? 'font-bold' : ''}`} onClick={() => handleTabChange('saved')}>
-              SAVED
-            </span>
-            <span className='py-3 cursor-pointer'>REELS</span>
-            <span className='py-3 cursor-pointer'>TAGS</span>
+            {isLoggedInUserProfile && (
+              <span className={`py-3 cursor-pointer ${activeTab === 'saved' ? 'font-bold' : ''}`} onClick={() => handleTabChange('saved')}>
+                SAVED
+              </span>
+            )}
+            <span className='py-3 cursor-pointer text-gray-400'>REELS</span>
+            <span className='py-3 cursor-pointer text-gray-400'>TAGS</span>
           </div>
-          <div className='grid grid-cols-3 gap-1'>
-            {
-              displayedPost?.map((post) => {
-                return (
-                  <div key={post?._id} className='relative group cursor-pointer'>
-                    <img src={post.image} alt='postimage' className='rounded-sm my-2 w-full aspect-square object-cover' />
-                    <div className='absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300'>
-                      <div className='flex items-center text-white space-x-4'>
-                        <button className='flex items-center gap-2 hover:text-gray-300'>
-                          <Heart />
-                          <span>{post?.likes.length}</span>
-                        </button>
-                        <button className='flex items-center gap-2 hover:text-gray-300'>
-                          <MessageCircle />
-                          <span>{post?.comments.length}</span>
-                        </button>
+          {
+            canViewProfile ? (
+              <div className='grid grid-cols-3 gap-1'>
+                {
+                  displayedPost?.map((post) => {
+                    return (
+                      <div key={post?._id} className='relative group cursor-pointer'>
+                        <img src={post.image} alt='postimage' className='rounded-sm my-2 w-full aspect-square object-cover' />
+                        <div className='absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300'>
+                          <div className='flex items-center text-white space-x-4'>
+                            <button className='flex items-center gap-2 hover:text-gray-300'>
+                              <Heart />
+                              <span>{post?.likes.length}</span>
+                            </button>
+                            <button className='flex items-center gap-2 hover:text-gray-300'>
+                              <MessageCircle />
+                              <span>{post?.comments.length}</span>
+                            </button>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                )
-              })
-            }
-          </div>
+                    )
+                  })
+                }
+              </div>
+            ) : (
+              <div className='flex flex-col items-center gap-2 py-10 text-center text-sm text-gray-500'>
+                <p>This account is private.</p>
+                <p>Send a follow request to see their posts.</p>
+              </div>
+            )
+          }
         </div>
       </div>
     </div>
