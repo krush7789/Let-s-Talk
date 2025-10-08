@@ -12,6 +12,32 @@ const sanitizeUserForClient = (userDoc) => {
     return user;
 };
 
+const toStringId = (value) => {
+    if(!value) return null;
+    if(typeof value === 'string') return value;
+    if(typeof value === 'number') return value.toString();
+    if(typeof value === 'object'){
+        if(value._id){
+            const nested = toStringId(value._id);
+            if(nested) return nested;
+        }
+        if(value.id){
+            const nested = toStringId(value.id);
+            if(nested) return nested;
+        }
+        if(typeof value.toString === 'function'){
+            const possible = value.toString();
+            if(typeof possible === 'string' && possible !== '[object Object]') return possible;
+        }
+        return null;
+    }
+    if(typeof value.toString === 'function'){
+        const possible = value.toString();
+        if(typeof possible === 'string' && possible !== '[object Object]') return possible;
+    }
+    return null;
+};
+
 export const register = async (req, res) => {
     try {
         const { username, email, password, accountType } = req.body;
@@ -229,6 +255,109 @@ export const getSuggestedUsers = async (req, res) => {
         })
     } catch (error) {
         console.log(error);
+    }
+};
+
+const buildConnectionList = (collection = [], viewerFollowingSet, viewerPendingSet, viewerId) => {
+    return collection
+        .map(entry => {
+            const id = toStringId(entry);
+            if(!id) return null;
+            const plain = typeof entry.toObject === 'function' ? entry.toObject({ getters: true }) : entry;
+
+            return {
+                _id: id,
+                username: plain?.username,
+                profilePicture: plain?.profilePicture,
+                bio: plain?.bio,
+                accountType: plain?.accountType,
+                isFollowing: viewerFollowingSet.has(id),
+                hasPendingRequest: viewerPendingSet.has(id),
+                isViewer: id === viewerId
+            };
+        })
+        .filter(Boolean);
+};
+
+export const getUserFollowersList = async (req, res) => {
+    try {
+        const targetId = req.params.id;
+        const viewerId = req.id;
+        const viewerIdString = viewerId?.toString?.() ?? viewerId;
+
+        const [targetUser, viewer] = await Promise.all([
+            User.findById(targetId)
+                .select('accountType followers username')
+                .populate({ path: 'followers', select: 'username profilePicture bio accountType' }),
+            User.findById(viewerId).select('following sentFollowRequests')
+        ]);
+
+        if(!targetUser){
+            return res.status(404).json({ success:false, message:'User not found' });
+        }
+
+        const isOwner = targetUser._id.equals(viewerId);
+        const isViewerFollowing = targetUser.followers.some(follower => {
+            const followerId = toStringId(follower);
+            return followerId === viewerIdString;
+        });
+
+        const canViewList = targetUser.accountType === 'public' || isOwner || isViewerFollowing;
+
+        if(!canViewList){
+            return res.status(403).json({ success:false, message:'This account is private. Follow to see their followers.' });
+        }
+
+        const viewerFollowingSet = new Set((viewer?.following || []).map(id => id.toString()));
+        const viewerPendingSet = new Set((viewer?.sentFollowRequests || []).map(id => id.toString()));
+
+        const followers = buildConnectionList(targetUser.followers, viewerFollowingSet, viewerPendingSet, viewerIdString);
+
+        return res.status(200).json({ success:true, users: followers });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ success:false, message:'Unable to load followers right now.' });
+    }
+};
+
+export const getUserFollowingList = async (req, res) => {
+    try {
+        const targetId = req.params.id;
+        const viewerId = req.id;
+        const viewerIdString = viewerId?.toString?.() ?? viewerId;
+
+        const [targetUser, viewer] = await Promise.all([
+            User.findById(targetId)
+                .select('accountType followers following username')
+                .populate({ path: 'following', select: 'username profilePicture bio accountType' }),
+            User.findById(viewerId).select('following sentFollowRequests')
+        ]);
+
+        if(!targetUser){
+            return res.status(404).json({ success:false, message:'User not found' });
+        }
+
+        const isOwner = targetUser._id.equals(viewerId);
+        const isViewerFollowing = targetUser.followers.some(follower => {
+            const followerId = toStringId(follower);
+            return followerId === viewerIdString;
+        });
+
+        const canViewList = targetUser.accountType === 'public' || isOwner || isViewerFollowing;
+
+        if(!canViewList){
+            return res.status(403).json({ success:false, message:'This account is private. Follow to see who they follow.' });
+        }
+
+        const viewerFollowingSet = new Set((viewer?.following || []).map(id => id.toString()));
+        const viewerPendingSet = new Set((viewer?.sentFollowRequests || []).map(id => id.toString()));
+
+        const following = buildConnectionList(targetUser.following, viewerFollowingSet, viewerPendingSet, viewerIdString);
+
+        return res.status(200).json({ success:true, users: following });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ success:false, message:'Unable to load following right now.' });
     }
 };
 export const followOrUnfollow = async (req, res) => {

@@ -4,12 +4,15 @@ import useGetUserProfile from '@/hooks/useGetUserProfile'
 import useReels from '@/hooks/useReels'
 import useGetAllPost from '@/hooks/useGetAllPost'
 import { Link, useParams } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Button } from './ui/button'
 import { Badge } from './ui/badge'
 import { AtSign, Heart, MessageCircle } from 'lucide-react'
 import axios from 'axios'
 import { toast } from 'sonner'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/dialog'
+import { computeUpdatedAuthUserAfterFollowAction, normaliseIdArray } from '@/lib/relationships'
+import { setAuthUser } from '@/redux/authSlice'
 
 const Profile = () => {
   useReels()
@@ -19,11 +22,18 @@ const Profile = () => {
   const userId = params.id
   const { refetch } = useGetUserProfile(userId)
   const [activeTab, setActiveTab] = useState('posts')
+  const [isConnectionsOpen, setIsConnectionsOpen] = useState(false)
+  const [connectionType, setConnectionType] = useState('followers')
+  const [connections, setConnections] = useState([])
+  const [isLoadingConnections, setIsLoadingConnections] = useState(false)
+  const [connectionError, setConnectionError] = useState(null)
+  const [connectionBusyIds, setConnectionBusyIds] = useState(() => new Set())
 
   useEffect(() => {
     setActiveTab('posts')
   }, [userId])
 
+  const dispatch = useDispatch()
   const { userProfile, user, userProfileMeta } = useSelector(store => store.auth)
   const { reels } = useSelector(store => store.reel)
   const { posts: feedPosts } = useSelector(store => store.post)
@@ -34,6 +44,7 @@ const Profile = () => {
   const canViewProfile = userProfileMeta?.canViewFullProfile || isLoggedInUserProfile
 
   const profileId = userProfile?._id
+  const API_BASE_URL = 'https://let-s-talk-lq7h.onrender.com/api/v1/user'
 
   const handleTabChange = (tab) => {
     setActiveTab(tab)
@@ -82,9 +93,15 @@ const Profile = () => {
 
   const handleFollowAction = async () => {
     try {
-      const res = await axios.post(`https://let-s-talk-lq7h.onrender.com/api/v1/user/followorunfollow/${userId}`, {}, { withCredentials: true })
+      const res = await axios.post(`${API_BASE_URL}/followorunfollow/${userId}`, {}, { withCredentials: true })
       if (res.data.success) {
         toast.success(res.data.message)
+        if (res.data.status) {
+          const updatedAuthUser = computeUpdatedAuthUserAfterFollowAction(user, res.data.status, userId)
+          if (updatedAuthUser) {
+            dispatch(setAuthUser(updatedAuthUser))
+          }
+        }
         await refetch()
       }
     } catch (error) {
@@ -99,6 +116,120 @@ const Profile = () => {
     if (hasPendingRequest) return 'Requested'
     return 'Follow'
   }, [isFollowing, hasPendingRequest, isLoggedInUserProfile])
+
+  const canViewConnections = useMemo(() => {
+    if (isLoggedInUserProfile) return true
+    if (userProfile?.accountType === 'public') return true
+    return Boolean(isFollowing)
+  }, [isFollowing, isLoggedInUserProfile, userProfile?.accountType])
+
+  useEffect(() => {
+    if (!isConnectionsOpen || !connectionType || !userId) return
+
+    let isActive = true
+
+    const fetchConnections = async () => {
+      setIsLoadingConnections(true)
+      setConnectionError(null)
+      try {
+        const res = await axios.get(`${API_BASE_URL}/${userId}/${connectionType}`, { withCredentials: true })
+        if (!isActive) return
+        if (res?.data?.success) {
+          setConnections(res?.data?.users ?? [])
+        } else {
+          setConnections([])
+          setConnectionError(res?.data?.message || 'Unable to load connections right now.')
+        }
+      } catch (error) {
+        if (!isActive) return
+        console.log(error)
+        setConnections([])
+        setConnectionError(error?.response?.data?.message || 'Unable to load connections right now.')
+      } finally {
+        if (isActive) {
+          setIsLoadingConnections(false)
+        }
+      }
+    }
+
+    fetchConnections()
+
+    return () => {
+      isActive = false
+    }
+  }, [API_BASE_URL, connectionType, isConnectionsOpen, userId])
+
+  const handleConnectionsDialogChange = (open) => {
+    setIsConnectionsOpen(open)
+    if (!open) {
+      setConnections([])
+      setConnectionError(null)
+      setConnectionBusyIds(new Set())
+    }
+  }
+
+  const openConnections = (type) => {
+    if (!canViewConnections) {
+      toast.info('Follow this account to see more details about their community.')
+      return
+    }
+    setConnectionType(type)
+    setIsConnectionsOpen(true)
+  }
+
+  const handleConnectionFollowToggle = async (connection) => {
+    const targetId = connection?._id
+    if (!targetId || !user?._id) return
+
+    const idString = targetId.toString()
+    setConnectionBusyIds(prev => {
+      const next = new Set(prev)
+      next.add(idString)
+      return next
+    })
+
+    try {
+      const res = await axios.post(`${API_BASE_URL}/followorunfollow/${idString}`, {}, { withCredentials: true })
+      if (res?.data?.success && res?.data?.status) {
+        const updatedAuthUser = computeUpdatedAuthUserAfterFollowAction(user, res.data.status, idString)
+        if (updatedAuthUser) {
+          dispatch(setAuthUser(updatedAuthUser))
+        }
+
+        setConnections(prev => prev.map(item => {
+          const itemId = item?._id?.toString?.() ?? item?._id
+          if (itemId?.toString() !== idString) return item
+
+          switch (res.data.status) {
+            case 'followed':
+              return { ...item, isFollowing: true, hasPendingRequest: false }
+            case 'unfollowed':
+              return { ...item, isFollowing: false, hasPendingRequest: false }
+            case 'requested':
+              return { ...item, isFollowing: false, hasPendingRequest: true }
+            case 'request_cancelled':
+              return { ...item, isFollowing: false, hasPendingRequest: false }
+            default:
+              return item
+          }
+        }))
+
+        toast.success(res.data.message)
+      }
+    } catch (error) {
+      console.log(error)
+      toast.error(error?.response?.data?.message || 'Unable to update follow status')
+    } finally {
+      setConnectionBusyIds(prev => {
+        const next = new Set(prev)
+        next.delete(idString)
+        return next
+      })
+    }
+  }
+
+  const viewerFollowingIds = useMemo(() => new Set(normaliseIdArray(user?.following)), [user?.following])
+  const viewerPendingIds = useMemo(() => new Set(normaliseIdArray(user?.sentFollowRequests)), [user?.sentFollowRequests])
 
   return (
     <div className='mx-auto flex max-w-6xl justify-center px-4 py-6 text-[#4a4a4a]'>
@@ -142,8 +273,20 @@ const Profile = () => {
               </div>
               <div className='flex flex-wrap items-center gap-4 text-sm text-[#6f6f6f]'>
                 <p><span className='font-semibold text-[#333333]'>{userProfile?.posts.length} </span>posts</p>
-                <p><span className='font-semibold text-[#333333]'>{userProfile?.followers.length} </span>followers</p>
-                <p><span className='font-semibold text-[#333333]'>{userProfile?.following.length} </span>following</p>
+                <button
+                  type='button'
+                  onClick={() => openConnections('followers')}
+                  className='transition hover:text-[#333333]'
+                >
+                  <span className='font-semibold text-[#333333]'>{userProfile?.followers.length} </span>followers
+                </button>
+                <button
+                  type='button'
+                  onClick={() => openConnections('following')}
+                  className='transition hover:text-[#333333]'
+                >
+                  <span className='font-semibold text-[#333333]'>{userProfile?.following.length} </span>following
+                </button>
               </div>
               <div className='flex flex-col gap-1'>
                 <span className='font-semibold text-[#333333]'>{userProfile?.bio || 'bio here...'}</span>
@@ -279,6 +422,90 @@ const Profile = () => {
           </div>
         </div>
       </div>
+      <Dialog open={isConnectionsOpen} onOpenChange={handleConnectionsDialogChange}>
+        <DialogContent className='max-w-xl'>
+          <DialogHeader>
+            <DialogTitle className='text-center text-lg font-semibold text-[#333333] sm:text-left'>
+              {connectionType === 'followers' ? 'Followers' : 'Following'}
+            </DialogTitle>
+            <DialogDescription className='text-center text-sm text-[#666666] sm:text-left'>
+              {connectionType === 'followers'
+                ? `People who follow ${userProfile?.username || 'this account'}`
+                : `Accounts ${userProfile?.username || 'this account'} follows`}
+            </DialogDescription>
+          </DialogHeader>
+          <div className='flex items-center justify-center gap-2 rounded-full bg-[#f6f6f6] p-1 text-xs font-semibold text-[#4a4a4a]'>
+            <button
+              type='button'
+              onClick={() => setConnectionType('followers')}
+              className={`w-full rounded-full px-4 py-2 transition ${connectionType === 'followers' ? 'bg-white text-[#333333] shadow-[0_8px_20px_-14px_rgba(0,0,0,0.45)]' : 'text-[#777777]'}`}
+            >
+              Followers
+            </button>
+            <button
+              type='button'
+              onClick={() => setConnectionType('following')}
+              className={`w-full rounded-full px-4 py-2 transition ${connectionType === 'following' ? 'bg-white text-[#333333] shadow-[0_8px_20px_-14px_rgba(0,0,0,0.45)]' : 'text-[#777777]'}`}
+            >
+              Following
+            </button>
+          </div>
+          <div className='mt-4 max-h-[420px] space-y-3 overflow-y-auto pr-1'>
+            {isLoadingConnections && (
+              <div className='flex items-center justify-center rounded-2xl border border-dashed border-[#d9d9d9] bg-white/60 py-10 text-sm text-[#666666]'>
+                Loading {connectionType}…
+              </div>
+            )}
+            {!isLoadingConnections && connectionError && (
+              <div className='rounded-2xl border border-dashed border-[#d9d9d9] bg-white/65 p-6 text-center text-sm text-[#6f6f6f]'>
+                {connectionError}
+              </div>
+            )}
+            {!isLoadingConnections && !connectionError && !connections.length && (
+              <div className='rounded-2xl border border-dashed border-[#d9d9d9] bg-white/65 p-6 text-center text-sm text-[#6f6f6f]'>
+                {connectionType === 'followers' ? 'No followers to show yet.' : 'Not following anyone yet.'}
+              </div>
+            )}
+            {!isLoadingConnections && !connectionError && connections.map(connection => {
+              const connectionId = connection?._id?.toString?.() ?? connection?._id
+              const isViewer = connectionId === (user?._id?.toString?.() ?? user?._id)
+              const isBusy = connectionBusyIds.has(connectionId)
+              const isFollowingConnection = connection?.isFollowing ?? viewerFollowingIds.has(connectionId)
+              const hasPendingRequest = connection?.hasPendingRequest ?? viewerPendingIds.has(connectionId)
+              const buttonLabel = isFollowingConnection ? 'Following' : hasPendingRequest ? 'Requested' : 'Follow'
+              const buttonVariant = isFollowingConnection ? 'secondary' : hasPendingRequest ? 'secondary' : 'default'
+
+              return (
+                <div key={connectionId} className='flex items-center justify-between gap-3 rounded-2xl border border-[rgba(0,0,0,0.04)] bg-white/80 px-4 py-3 shadow-[0_16px_32px_-42px_rgba(51,51,51,0.45)]'>
+                  <Link to={`/profile/${connectionId}`} className='flex flex-1 items-center gap-3'>
+                    <Avatar className='h-11 w-11 border border-[rgba(0,0,0,0.05)] bg-white'>
+                      <AvatarImage src={connection?.profilePicture} alt={`${connection?.username || 'user'}-avatar`} />
+                      <AvatarFallback>LT</AvatarFallback>
+                    </Avatar>
+                    <div className='min-w-0'>
+                      <p className='truncate text-sm font-semibold text-[#333333]'>{connection?.username}</p>
+                      {connection?.bio && <p className='truncate text-xs text-[#6f6f6f]'>{connection.bio}</p>}
+                    </div>
+                  </Link>
+                  {isViewer ? (
+                    <span className='rounded-full bg-[#f6f6f6] px-3 py-1 text-xs font-semibold text-[#777777]'>You</span>
+                  ) : (
+                    <Button
+                      size='sm'
+                      className='rounded-full px-4'
+                      disabled={isBusy}
+                      variant={buttonVariant}
+                      onClick={() => handleConnectionFollowToggle(connection)}
+                    >
+                      {isBusy ? 'Please wait…' : buttonLabel}
+                    </Button>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
