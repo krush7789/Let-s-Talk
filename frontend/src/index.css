@@ -5,20 +5,23 @@
 :root {
   color-scheme: light;
   --color-background: #f6f6f6;
-  --color-surface: #ffffff;
-  --color-surface-subtle: #fbf7ff;
+  --color-surface: #fcfcfc;
+  --color-surface-raised: #ffffff;
+  --color-surface-muted: #f0edf6;
+  --color-outline: #d9d9d9;
   --color-primary-start: #c8a9f1;
   --color-primary-end: #f8c8a3;
+  --color-primary-solid: #cdb4f4;
   --color-accent: #d5b69d;
   --color-accent-soft: #e8d6c6;
   --color-text: #333333;
   --color-text-muted: #4a4a4a;
-  --color-divider: rgba(0, 0, 0, 0.05);
-  --color-shadow: rgba(0, 0, 0, 0.08);
+  --color-divider: rgba(0, 0, 0, 0.06);
+  --color-shadow: rgba(0, 0, 0, 0.04);
 }
 
 body {
-  background: var(--color-background);
+  background: linear-gradient(135deg, rgba(200, 169, 241, 0.08), rgba(248, 200, 163, 0.06)) var(--color-background);
   color: var(--color-text);
   font-family: "Inter", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   min-height: 100vh;
