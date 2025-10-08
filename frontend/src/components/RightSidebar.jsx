@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom';
 import SuggestedUsers from './SuggestedUsers';
+import FollowRequests from './FollowRequests';
 
 const RightSidebar = () => {
   const { user } = useSelector(store => store.auth);
@@ -21,6 +22,7 @@ const RightSidebar = () => {
         </div>
       </div>
       <SuggestedUsers/>
+      <FollowRequests />
     </div>
   )
 }

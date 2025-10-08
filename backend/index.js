@@ -6,6 +6,8 @@ import connectDB from "./utils/db.js";
 import userRoute from "./routes/user.route.js";
 import postRoute from "./routes/post.route.js";
 import messageRoute from "./routes/message.route.js";
+import storyRoute from "./routes/story.route.js";
+import reelRoute from "./routes/reel.route.js";
 import { app, server } from "./socket/socket.js";
 import path from "path";
  
@@ -30,6 +32,8 @@ app.use(cors(corsOptions));
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/post", postRoute);
 app.use("/api/v1/message", messageRoute);
+app.use("/api/v1/story", storyRoute);
+app.use("/api/v1/reel", reelRoute);
 
 
 app.use(express.static(path.join(__dirname, "/frontend/dist")));

@@ -7,8 +7,11 @@ const userSchema = new mongoose.Schema({
     profilePicture:{type:String,default:''},
     bio:{type:String, default:''},
     gender:{type:String,enum:['male','female']},
+    accountType:{type:String, enum:['public','private'], default:'public'},
     followers:[{type:mongoose.Schema.Types.ObjectId, ref:'User'}],
     following:[{type:mongoose.Schema.Types.ObjectId, ref:'User'}],
+    followRequests:[{type:mongoose.Schema.Types.ObjectId, ref:'User'}],
+    sentFollowRequests:[{type:mongoose.Schema.Types.ObjectId, ref:'User'}],
     posts:[{type:mongoose.Schema.Types.ObjectId, ref:'Post'}],
     bookmarks:[{type:mongoose.Schema.Types.ObjectId, ref:'Post'}]
 },{timestamps:true});
