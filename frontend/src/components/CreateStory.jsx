@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader } from './ui/dialog';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Textarea } from './ui/textarea';
@@ -15,6 +15,7 @@ const CreateStory = ({ open, setOpen }) => {
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState('');
   const [caption, setCaption] = useState('');
+  const [mediaType, setMediaType] = useState('');
   const [loading, setLoading] = useState(false);
   const { user } = useSelector(store => store.auth);
   const dispatch = useDispatch();
@@ -22,7 +23,22 @@ const CreateStory = ({ open, setOpen }) => {
   const handleFileChange = async (e) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
+      const isImage = selectedFile.type.startsWith('image/');
+      const isVideo = selectedFile.type.startsWith('video/');
+
+      if (!isImage && !isVideo) {
+        toast.error('Only image or video files are supported for stories.');
+        return;
+      }
+
+      const maxSize = 25 * 1024 * 1024; // 25 MB cap similar to Instagram
+      if (selectedFile.size > maxSize) {
+        toast.error('Stories can be up to 25MB. Choose a smaller file.');
+        return;
+      }
+
       setFile(selectedFile);
+      setMediaType(isVideo ? 'video' : 'image');
       const dataUrl = await readFileAsDataURL(selectedFile);
       setPreview(dataUrl);
     }
@@ -32,6 +48,10 @@ const CreateStory = ({ open, setOpen }) => {
     setFile(null);
     setPreview('');
     setCaption('');
+    setMediaType('');
+    if (mediaRef.current) {
+      mediaRef.current.value = '';
+    }
   };
 
   const handleSubmit = async () => {
@@ -41,6 +61,7 @@ const CreateStory = ({ open, setOpen }) => {
       const formData = new FormData();
       formData.append('media', file);
       if (caption) formData.append('caption', caption);
+      if (mediaType) formData.append('mediaType', mediaType);
       const res = await axios.post('https://let-s-talk-lq7h.onrender.com/api/v1/story', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
@@ -60,9 +81,25 @@ const CreateStory = ({ open, setOpen }) => {
     }
   };
 
+  useEffect(() => {
+    if (!open) {
+      resetForm();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
+  const handleOpenChange = (nextOpen) => {
+    if (!nextOpen) {
+      setOpen(false);
+      resetForm();
+    } else {
+      setOpen(true);
+    }
+  };
+
   return (
-    <Dialog open={open}>
-      <DialogContent onInteractOutside={() => setOpen(false)} className="sm:max-w-[425px]">
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader className="text-center font-semibold">Create Story</DialogHeader>
         <div className="flex items-center gap-3">
           <Avatar>
@@ -73,7 +110,7 @@ const CreateStory = ({ open, setOpen }) => {
           </Avatar>
           <div>
             <h2 className="font-semibold text-sm">{user?.username}</h2>
-            <p className="text-xs text-muted-foreground">Share a moment that disappears in 24 hours.</p>
+            <p className="text-xs text-muted-foreground">Photos and videos disappear after 24 hours.</p>
           </div>
         </div>
         <Textarea
@@ -85,7 +122,16 @@ const CreateStory = ({ open, setOpen }) => {
         />
         {preview ? (
           <div className="w-full h-72 rounded-lg overflow-hidden bg-muted flex items-center justify-center">
-            <img src={preview} alt="story preview" className="object-cover h-full w-full" />
+            {mediaType === 'video' ? (
+              <video
+                src={preview}
+                className="object-cover h-full w-full"
+                controls
+                playsInline
+              />
+            ) : (
+              <img src={preview} alt="story preview" className="object-cover h-full w-full" />
+            )}
           </div>
         ) : (
           <button
@@ -93,10 +139,10 @@ const CreateStory = ({ open, setOpen }) => {
             className="w-full h-72 rounded-lg border border-dashed border-muted-foreground/40 flex flex-col items-center justify-center text-sm text-muted-foreground"
           >
             <Plus className="h-6 w-6 mb-2" />
-            Tap to add photo or video
+            Tap to add photo or video (up to 25MB)
           </button>
         )}
-        <input ref={mediaRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
+        <input ref={mediaRef} type="file" accept="image/*,video/*" className="hidden" onChange={handleFileChange} />
         {preview && (
           loading ? (
             <Button disabled className="w-full">

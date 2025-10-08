@@ -7,18 +7,28 @@ const useGetStories = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    let ignore = false;
+
     const fetchStories = async () => {
       try {
         const res = await axios.get('https://let-s-talk-lq7h.onrender.com/api/v1/story/feed', { withCredentials: true });
-        if (res.data.success) {
+        if (!ignore && res.data.success) {
           dispatch(setStories(res.data.stories));
         }
       } catch (error) {
-        console.log(error);
+        if (!ignore) {
+          console.log(error);
+        }
       }
     };
 
     fetchStories();
+    const interval = setInterval(fetchStories, 60 * 1000);
+
+    return () => {
+      ignore = true;
+      clearInterval(interval);
+    };
   }, [dispatch]);
 };
 
