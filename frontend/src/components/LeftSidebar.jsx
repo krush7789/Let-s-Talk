@@ -1,4 +1,4 @@
-import { Heart, Home, LogOut, MessageCircle, PlusSquare, Search, Sparkles, TrendingUp } from 'lucide-react'
+import { Heart, Home, LogOut, MessageCircle, PlusSquare, Search, TrendingUp } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { toast } from 'sonner'
 import axios from 'axios'
@@ -16,6 +16,7 @@ const LeftSidebar = ({ mobileOpen, onMobileClose, createOpen, onCreateOpenChange
   const { user } = useSelector(store => store.auth)
   const { likeNotification } = useSelector(store => store.realTimeNotification)
   const dispatch = useDispatch()
+  const currentYear = new Date().getFullYear()
 
   const logoutHandler = async () => {
     try {
@@ -133,7 +134,9 @@ const LeftSidebar = ({ mobileOpen, onMobileClose, createOpen, onCreateOpenChange
             </Avatar>
             <div className='flex flex-col'>
               <span className='text-sm font-semibold text-[var(--color-text)]'>{user?.username}</span>
-              <span className='text-xs text-[var(--color-text-muted)]'>{user?.bio || 'Craft your story & inspire others'}</span>
+              {user?.bio ? (
+                <span className='text-xs text-[var(--color-text-muted)]'>{user.bio}</span>
+              ) : null}
             </div>
           </div>
           <Button
@@ -180,15 +183,8 @@ const LeftSidebar = ({ mobileOpen, onMobileClose, createOpen, onCreateOpenChange
         </nav>
 
         <div className='mt-auto border-t border-[var(--color-outline)] px-5 py-5 text-xs text-[var(--color-text-muted)]'>
-          <div className='flex items-start gap-3'>
-            <div className='flex h-9 w-9 items-center justify-center rounded-md bg-[var(--color-primary-start)]/15 text-[var(--color-primary-start)]'>
-              <Sparkles className='h-4 w-4' />
-            </div>
-            <div className='space-y-1'>
-              <p className='text-sm font-semibold text-[var(--color-text)]'>Need a spark?</p>
-              <p>Jump into Explore to find creators and conversations tailored for you.</p>
-            </div>
-          </div>
+          <p className='font-semibold text-[var(--color-text)]'>Let&apos;s Talk</p>
+          <p>© {currentYear}</p>
         </div>
 
         <CreatePost open={createOpen} setOpen={onCreateOpenChange} />

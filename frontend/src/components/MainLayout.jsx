@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
-import { Menu, Search, Sparkles } from 'lucide-react'
+import { Menu, Search } from 'lucide-react'
 import LeftSidebar from './LeftSidebar'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
@@ -23,10 +23,9 @@ const MainLayout = () => {
             >
               <Menu className="h-5 w-5" />
             </Button>
-            <div className="flex items-center gap-2 rounded-lg border border-[var(--color-outline)] bg-[var(--color-surface)] px-3 py-1.5">
-              <Sparkles className="h-5 w-5 text-[var(--color-primary-start)]" />
-              <span className="font-semibold tracking-tight text-[var(--color-text)]">Let&apos;s Talk</span>
-            </div>
+          <div className="flex items-center gap-2 rounded-lg border border-[var(--color-outline)] bg-[var(--color-surface)] px-3 py-1.5">
+            <span className="font-semibold tracking-tight text-[var(--color-text)]">Let&apos;s Talk</span>
+          </div>
           </div>
           <div className="hidden flex-1 items-center gap-2 lg:flex">
             <div className="relative w-full max-w-md">

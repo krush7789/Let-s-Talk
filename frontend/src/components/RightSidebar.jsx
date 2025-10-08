@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import SuggestedUsers from './SuggestedUsers'
 import FollowRequests from './FollowRequests'
-import { Sparkles } from 'lucide-react'
 
 const RightSidebar = () => {
   const { user } = useSelector(store => store.auth)
@@ -20,18 +19,9 @@ const RightSidebar = () => {
           <h1 className='text-sm font-semibold text-[var(--color-text)]'>
             <Link to={`/profile/${user?._id}`}>{user?.username}</Link>
           </h1>
-          <span className='text-xs text-[var(--color-text-muted)]'>{user?.bio || 'Share a glimpse of your world today.'}</span>
-        </div>
-      </div>
-      <div className='rounded-lg border border-[var(--color-outline)] bg-[var(--color-surface)] p-4 text-xs text-[var(--color-text-muted)]'>
-        <div className='flex items-start gap-3'>
-          <span className='flex h-9 w-9 items-center justify-center rounded-md bg-[var(--color-primary-start)]/15 text-[var(--color-primary-start)]'>
-            <Sparkles className='h-4 w-4' />
-          </span>
-          <div className='space-y-1'>
-            <p className='text-sm font-semibold text-[var(--color-text)]'>Creator cues</p>
-            <p>Drop a reel or story to stay on top of the community radar.</p>
-          </div>
+          {user?.bio ? (
+            <span className='text-xs text-[var(--color-text-muted)]'>{user.bio}</span>
+          ) : null}
         </div>
       </div>
       <SuggestedUsers />

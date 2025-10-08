@@ -13,6 +13,7 @@ import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/dialog'
 import { computeUpdatedAuthUserAfterFollowAction, normaliseIdArray } from '@/lib/relationships'
 import { setAuthUser } from '@/redux/authSlice'
+import ReelPlayerDialog from './ReelPlayerDialog'
 
 const Profile = () => {
   useReels()
@@ -28,6 +29,8 @@ const Profile = () => {
   const [isLoadingConnections, setIsLoadingConnections] = useState(false)
   const [connectionError, setConnectionError] = useState(null)
   const [connectionBusyIds, setConnectionBusyIds] = useState(() => new Set())
+  const [activeReel, setActiveReel] = useState(null)
+  const [isReelDialogOpen, setIsReelDialogOpen] = useState(false)
 
   useEffect(() => {
     setActiveTab('posts')
@@ -231,6 +234,19 @@ const Profile = () => {
   const viewerFollowingIds = useMemo(() => new Set(normaliseIdArray(user?.following)), [user?.following])
   const viewerPendingIds = useMemo(() => new Set(normaliseIdArray(user?.sentFollowRequests)), [user?.sentFollowRequests])
 
+  const handleOpenReel = (reel) => {
+    if (!reel) return
+    setActiveReel(reel)
+    setIsReelDialogOpen(true)
+  }
+
+  const handleReelDialogChange = (open) => {
+    setIsReelDialogOpen(open)
+    if (!open) {
+      setActiveReel(null)
+    }
+  }
+
   return (
     <div className='mx-auto flex max-w-6xl justify-center px-4 py-6 text-[#4a4a4a]'>
       <div className='flex w-full flex-col gap-12 rounded-[2.5rem] border border-[rgba(0,0,0,0.05)] bg-white/85 p-8 shadow-[0_32px_80px_-58px_rgba(51,51,51,0.5)]'>
@@ -347,12 +363,14 @@ const Profile = () => {
                 profileReels.length ? (
                   <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
                     {profileReels.map(reel => (
-                      <div
+                      <button
+                        type='button'
                         key={reel._id}
+                        onClick={() => handleOpenReel(reel)}
                         className='group relative overflow-hidden rounded-3xl border border-[rgba(200,169,241,0.35)] bg-white/80 shadow-[0_24px_60px_-48px_rgba(200,169,241,0.45)] transition hover:border-[#c8a9f1]/60 hover:shadow-[0_28px_72px_-50px_rgba(200,169,241,0.6)]'
                       >
-                        <video src={reel.videoUrl} muted loop playsInline className='aspect-[9/16] w-full object-cover' />
-                        <div className='absolute inset-0 flex flex-col justify-between bg-gradient-to-t from-black/55 via-transparent to-transparent p-4 opacity-0 transition group-hover:opacity-100'>
+                        <video src={reel.videoUrl} muted loop playsInline className='pointer-events-none aspect-[9/16] w-full object-cover' />
+                        <div className='pointer-events-none absolute inset-0 flex flex-col justify-between bg-gradient-to-t from-black/55 via-transparent to-transparent p-4 opacity-0 transition group-hover:opacity-100'>
                           <div className='flex items-center gap-3'>
                             <Avatar className='h-9 w-9 border border-[rgba(255,255,255,0.6)]'>
                               <AvatarImage src={reel.author?.profilePicture} alt={reel.author?.username} />
@@ -370,7 +388,7 @@ const Profile = () => {
                             </span>
                           </div>
                         </div>
-                      </div>
+                      </button>
                     ))}
                   </div>
                 ) : (
@@ -387,26 +405,39 @@ const Profile = () => {
             ) : canViewProfile || (activeTab === 'saved' && isLoggedInUserProfile) ? (
               activeCollection.length ? (
                 <div className='grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4'>
-                  {activeCollection.map(post => (
-                    <div
-                      key={post?._id}
-                      className='group relative overflow-hidden rounded-3xl border border-[rgba(0,0,0,0.05)] bg-white/80 shadow-[0_24px_60px_-50px_rgba(51,51,51,0.35)]'
-                    >
-                      <img src={post.image} alt='postimage' className='aspect-square w-full object-cover transition duration-300 group-hover:scale-105' />
-                      <div className='absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100'>
-                        <div className='flex items-center gap-6 text-sm font-semibold text-white'>
-                          <span className='flex items-center gap-2'>
-                            <Heart className='h-4 w-4 text-[#f4b9b9]' />
-                            {post?.likes?.length || 0}
-                          </span>
-                          <span className='flex items-center gap-2'>
-                            <MessageCircle className='h-4 w-4 text-[#c8a9f1]' />
-                            {post?.comments?.length || 0}
-                          </span>
+                  {activeCollection.map((post, index) => {
+                    const postId = post?._id?.toString?.() ?? post?._id
+                    const key = postId || `profile-post-${index}`
+                    const CardContent = (
+                      <>
+                        <img src={post.image} alt='postimage' className='aspect-square w-full object-cover transition duration-300 group-hover:scale-105' />
+                        <div className='absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100'>
+                          <div className='flex items-center gap-6 text-sm font-semibold text-white'>
+                            <span className='flex items-center gap-2'>
+                              <Heart className='h-4 w-4 text-[#f4b9b9]' />
+                              {post?.likes?.length || 0}
+                            </span>
+                            <span className='flex items-center gap-2'>
+                              <MessageCircle className='h-4 w-4 text-[#c8a9f1]' />
+                              {post?.comments?.length || 0}
+                            </span>
+                          </div>
                         </div>
+                      </>
+                    )
+
+                    const baseClass = 'group relative overflow-hidden rounded-3xl border border-[rgba(0,0,0,0.05)] bg-white/80 shadow-[0_24px_60px_-50px_rgba(51,51,51,0.35)]'
+
+                    return postId ? (
+                      <Link key={key} to={`/p/${postId}`} className={`block ${baseClass}`}>
+                        {CardContent}
+                      </Link>
+                    ) : (
+                      <div key={key} className={baseClass}>
+                        {CardContent}
                       </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               ) : (
                 <div className='rounded-3xl border border-[rgba(0,0,0,0.05)] bg-white/70 p-10 text-center text-sm text-[#6f6f6f]'>
@@ -472,7 +503,14 @@ const Profile = () => {
               const isBusy = connectionBusyIds.has(connectionId)
               const isFollowingConnection = connection?.isFollowing ?? viewerFollowingIds.has(connectionId)
               const hasPendingRequest = connection?.hasPendingRequest ?? viewerPendingIds.has(connectionId)
-              const buttonLabel = isFollowingConnection ? 'Following' : hasPendingRequest ? 'Requested' : 'Follow'
+              const followsViewer = connectionType === 'followers' && isLoggedInUserProfile
+              const buttonLabel = isFollowingConnection
+                ? 'Following'
+                : hasPendingRequest
+                  ? 'Requested'
+                  : followsViewer
+                    ? 'Follow back'
+                    : 'Follow'
               const buttonVariant = isFollowingConnection ? 'secondary' : hasPendingRequest ? 'secondary' : 'default'
 
               return (
@@ -484,6 +522,9 @@ const Profile = () => {
                     </Avatar>
                     <div className='min-w-0'>
                       <p className='truncate text-sm font-semibold text-[#333333]'>{connection?.username}</p>
+                      {connectionType === 'followers' && isLoggedInUserProfile && !isViewer && (
+                        <p className='text-xs text-[#8c8c8c]'>Follows you</p>
+                      )}
                       {connection?.bio && <p className='truncate text-xs text-[#6f6f6f]'>{connection.bio}</p>}
                     </div>
                   </Link>
@@ -506,6 +547,7 @@ const Profile = () => {
           </div>
         </DialogContent>
       </Dialog>
+      <ReelPlayerDialog reel={activeReel} open={isReelDialogOpen} onOpenChange={handleReelDialogChange} />
     </div>
   )
 }
